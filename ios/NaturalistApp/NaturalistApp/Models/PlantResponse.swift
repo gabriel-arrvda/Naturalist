@@ -1,7 +1,7 @@
 import Foundation
 
 struct PlantResponse: Decodable {
-    let bestMatch: String?
+    let bestMatch: String
     let summary: String?
 
     private enum CodingKeys: String, CodingKey {
