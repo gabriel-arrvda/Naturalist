@@ -1,0 +1,40 @@
+{
+  "melhor_correspondencia": "Celosia argentea L.",
+  "órgãos_previstos": [
+    {
+      "image": "cef0b787bea4d37e96cd15cd1f337c4a",
+      "filename": "flor_IMG_0980.jpeg",
+      "organ": "habit",
+      "score": 0.55006
+    },
+    {
+      "image": "cef0b787bea4d37e96cd15cd1f337c4a",
+      "filename": "folha_IMG_0980.jpeg",
+      "organ": "habit",
+      "score": 0.55006
+    }
+  ],
+  "resumo_planta": "A **Celosia argentea**, popularmente conhecida como **Crista-de-galo** ou **Suspiro**, é uma planta ornamental muito apreciada por suas inflorescências vibrantes, que lembram o formato de uma crista ou uma pluma. É uma excelente escolha para dar cor a canteiros e vasos.\n\n### Cuidados Básicos\n\n*   **Luz:** Ela ama o sol pleno. Para que floresça com vigor e mantenha suas cores intensas, precisa de pelo menos 6 horas de luz solar direta por dia.\n*   **Rega:** O solo deve ser mantido levemente úmido, mas nunca encharcado. Regue quando sentir que a camada superficial da terra começou a secar. Evite molhar as flores diretamente para prevenir o surgimento de fungos.\n*   **Solo:** Prefere solos férteis, ricos em matéria orgânica e, acima de tudo, **bem drenados**. Se for plantar em vasos, certifique-se de que haja furos no fundo para evitar o acúmulo de água, que pode apodrecer as raízes.\n\n### Recomendações Práticas\n\n1.  **Adubação:** Durante o período de floração, aplique um fertilizante rico em fósforo (como o NPK 04-14-08) a cada 15 ou 30 dias para estimular flores mais bonitas.\n2.  **Limpeza:** Remova as flores secas ou murchas. Isso ajuda a planta a direcionar energia para produzir novas flores e mantém o visual limpo.\n3.  **Clima:** É uma planta de clima quente. Se você mora em uma região com invernos rigorosos, saiba que ela é sensível ao frio intenso e geadas.\n\n### Toxicidade\nA *Celosia argentea* **não é considerada tóxica** para cães ou gatos, sendo uma opção segura para quem tem animais de estimação em casa.\n\n**Dica de ouro:** Por ser uma planta de crescimento rápido, a Crista-de-galo é ideal para quem quer resultados visuais imediatos no jardim. Se notar que ela está ficando \"estiolada\" (com o caule muito comprido e fraco), é um sinal claro de que ela precisa de mais luz solar.",
+  "resultados": [
+    {
+      "espécie": "Celosia argentea L.",
+      "nome_científico_sem_autor": "Celosia argentea",
+      "nomes_comuns": [
+        "Crista de Galo"
+      ],
+      "confiança": 0.75979
+    },
+    {
+      "espécie": "Amaranthus cruentus L.",
+      "nome_científico_sem_autor": "Amaranthus cruentus",
+      "nomes_comuns": [],
+      "confiança": 0.0693
+    },
+    {
+      "espécie": "Amaranthus hypochondriacus L.",
+      "nome_científico_sem_autor": "Amaranthus hypochondriacus",
+      "nomes_comuns": [],
+      "confiança": 0.01638
+    }
+  ]
+}
