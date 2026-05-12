@@ -4,7 +4,7 @@ import SwiftUI
 struct NaturalistApp: App {
     var body: some Scene {
         WindowGroup {
-            Text("NaturalistApp")
+            Text("Naturalist")
         }
     }
 }
