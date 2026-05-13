@@ -1,14 +1,22 @@
 from io import BytesIO
+from datetime import datetime, timezone
 import logging
 import os
 import time
-from typing import Optional
+from typing import Any, Optional
 
 import requests
 import google.generativeai as genai
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
+
+import firebase_admin
+from firebase_admin import credentials, firestore
+
+cred = credentials.Certificate("serviceAccountKey.json")
+firebase_admin.initialize_app(cred)
+db = firestore.client()
 
 load_dotenv()
 
@@ -140,7 +148,40 @@ async def predict(file: UploadFile = File(...)):
     response_data = response.json()
     results = response_data.get("results", [])
     best_match = response_data.get("bestMatch")
-    summary = summarize_plant(best_match) if best_match else None
+
+    if not best_match:
+        raise HTTPException(status_code=502, detail="Resposta do Pl@ntNet sem bestMatch")
+
+    image_metadata = {
+        "filename": file.filename,
+        "content_type": file.content_type,
+        "size_bytes": len(image_bytes),
+        "uploaded_at": datetime.now(timezone.utc).isoformat(),
+    }
+
+    plant_ref = db.collection("plants").document(best_match)
+    doc = plant_ref.get()
+
+    summary = None
+
+    if not doc.exists:
+        summary = summarize_plant(best_match) if best_match else None
+        plant_ref.set({
+            "name": best_match, 
+            "created_at": firestore.SERVER_TIMESTAMP, 
+            "summary": summary, 
+            "common": results[0].get("species", {}).get("commonNames", []) if results else [],
+            "confidence": results[0].get("score") if results else None,
+            "sent_images": [image_metadata],
+        })
+    else:
+        summary = doc.to_dict().get("summary")
+        plant_ref.update(
+            {
+                "sent_images": firestore.ArrayUnion([image_metadata]),
+                "updated_at": firestore.SERVER_TIMESTAMP,
+            }
+        )
 
     return {
         "melhor_correspondencia": best_match,
@@ -158,6 +199,29 @@ async def predict(file: UploadFile = File(...)):
             for item in results
         ],
     }
+
+
+@app.get("/plants")
+def list_saved_plants():
+    docs = db.collection("plants").stream()
+
+    plants: list[dict[str, Any]] = []
+    for doc in docs:
+        data = doc.to_dict() or {}
+        plants.append(
+            {
+                "id": doc.id,
+                "name": data.get("name"),
+                "summary": data.get("summary"),
+                "common": data.get("common", []),
+                "confidence": data.get("confidence"),
+                "created_at": str(data.get("created_at")) if data.get("created_at") else None,
+                "updated_at": str(data.get("updated_at")) if data.get("updated_at") else None,
+                "sent_images": data.get("sent_images", []),
+            }
+        )
+
+    return {"total": len(plants), "plants": plants}
 
 
 # Fluxo antigo preservado para a futura volta do FAISS/modelo próprio.
