@@ -15,57 +15,19 @@ struct PlantScannerView: View {
     }
 
     var body: some View {
-        ZStack {
-            Theme.surface
-                .ignoresSafeArea()
-
+        NavigationStack {
             ScrollView {
-                VStack(spacing: 16) {
-                    Text("Naturalist")
-                        .font(.largeTitle)
-                        .bold()
-                        .foregroundStyle(Theme.darkGreen)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-
-                    Button("Fotografar planta") {
-                        if UIImagePickerController.isSourceTypeAvailable(.camera) {
-                            showCamera = true
-                        } else {
-                            showCameraUnavailableAlert = true
-                        }
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .buttonBorderShape(.roundedRectangle(radius: 12))
-                    .frame(maxWidth: .infinity)
-
-                    PhotosPicker(selection: $pickerItem, matching: .images) {
-                        Text("Escolher da galeria")
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.bordered)
-                    .buttonBorderShape(.roundedRectangle(radius: 12))
-
-                    Button("Analisar planta") {
-                        Task {
-                            await viewModel.analyze(imageData: imageData, filename: selectedFilename)
-                        }
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .buttonBorderShape(.roundedRectangle(radius: 12))
-                    .frame(maxWidth: .infinity)
-
-                    content
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(16)
-                        .background(Color.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                .stroke(Theme.primaryGreen.opacity(0.2), lineWidth: 1)
-                        )
+                VStack(spacing: 18) {
+                    heroCard
+                    actionsCard
+                    previewCard
+                    analyzeButton
+                    resultCard
                 }
                 .padding()
             }
+            .background(Theme.surface.ignoresSafeArea())
+            .navigationTitle("Naturalist")
         }
         .tint(Theme.primaryGreen)
         .sheet(isPresented: $showCamera) {
@@ -96,6 +58,137 @@ struct PlantScannerView: View {
         }
     }
 
+    private var heroCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Scanner inteligente")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(Theme.primaryGreen)
+            Text("Identifique e salve suas plantas com um visual mais elegante.")
+                .font(.title.bold())
+                .foregroundStyle(Theme.darkGreen)
+            Text("Tire uma foto ou escolha da galeria para gerar um resumo prático.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(20)
+        .background(Theme.cardBackground)
+        .overlay(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .stroke(Theme.cardBorder, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+    }
+
+    private var actionsCard: some View {
+        HStack(spacing: 12) {
+            Button {
+                if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                    showCamera = true
+                } else {
+                    showCameraUnavailableAlert = true
+                }
+            } label: {
+                Label("Fotografar", systemImage: "camera.viewfinder")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+
+            PhotosPicker(selection: $pickerItem, matching: .images) {
+                Label("Galeria", systemImage: "photo.on.rectangle")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.large)
+        }
+    }
+
+    private var previewCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Prévia")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(Theme.primaryGreen)
+
+            Group {
+                if let imageData, let uiImage = UIImage(data: imageData) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 250)
+                } else {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 22, style: .continuous)
+                            .fill(Theme.surface)
+
+                        VStack(spacing: 10) {
+                            Image(systemName: "leaf")
+                                .font(.system(size: 28, weight: .semibold))
+                                .foregroundStyle(Theme.primaryGreen)
+                            Text("Escolha uma planta para analisar")
+                                .font(.headline)
+                                .foregroundStyle(Theme.darkGreen)
+                            Text("A imagem aparece aqui antes do envio.")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding()
+                    }
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 250)
+                }
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+        }
+        .padding(20)
+        .background(Theme.cardBackground)
+        .overlay(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .stroke(Theme.cardBorder, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+    }
+
+    private var analyzeButton: some View {
+        Button {
+            Task {
+                await viewModel.analyze(imageData: imageData, filename: selectedFilename)
+            }
+        } label: {
+            Label("Analisar planta", systemImage: "sparkles")
+                .frame(maxWidth: .infinity)
+        }
+        .buttonStyle(.borderedProminent)
+        .controlSize(.large)
+        .disabled(imageData == nil)
+        .opacity(imageData == nil ? 0.6 : 1)
+    }
+
+    @ViewBuilder
+    private var resultCard: some View {
+        switch viewModel.state {
+        case .idle:
+            PlantSummaryCard(
+                title: "Pronto para analisar",
+                summary: "Tire uma foto ou escolha da galeria para identificar a planta."
+            )
+        case .loading:
+            PlantSummaryCard(
+                title: "Analisando",
+                summary: "Estamos consultando a API para encontrar a melhor correspondência."
+            )
+        case .success:
+            PlantSummaryCard(title: viewModel.bestMatchTitle, summary: viewModel.summaryText)
+        case .error:
+            PlantSummaryCard(title: "Erro na análise", summary: viewModel.errorMessage)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 24, style: .continuous)
+                        .stroke(Color.red.opacity(0.25), lineWidth: 1)
+                )
+        }
+    }
+
     private func normalizedJPEGData(from image: UIImage) -> Data? {
         image.jpegData(compressionQuality: 0.9)
     }
@@ -106,32 +199,33 @@ struct PlantScannerView: View {
         }
         return normalizedJPEGData(from: image)
     }
+}
 
-    @ViewBuilder
-    private var content: some View {
-        switch viewModel.state {
-        case .idle:
-            Text("Selecione ou fotografe uma planta para começar.")
-        case .loading:
-            ProgressView("Analisando sua planta...")
-        case .success:
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Melhor correspondência")
-                    .font(.caption)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(Theme.darkGreen.opacity(0.75))
-                Text(viewModel.bestMatchTitle)
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .foregroundStyle(Theme.darkGreen)
-                Text(viewModel.summaryText)
-                    .font(.body)
-                    .foregroundStyle(.primary)
-            }
-        case .error:
-            Text(viewModel.errorMessage)
-                .foregroundStyle(.red)
+private struct PlantSummaryCard: View {
+    let title: String
+    let summary: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Melhor correspondência")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(Theme.primaryGreen)
+            Text(title)
+                .font(.title2.bold())
+                .foregroundStyle(Theme.darkGreen)
+            Text(summary)
+                .font(.body)
+                .foregroundStyle(.primary)
+                .fixedSize(horizontal: false, vertical: true)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(20)
+        .background(Theme.cardBackground)
+        .overlay(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .stroke(Theme.cardBorder, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
     }
 }
 
@@ -159,7 +253,10 @@ private struct CameraCaptureView: UIViewControllerRepresentable {
             self.onImagePicked = onImagePicked
         }
 
-        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+        func imagePickerController(
+            _ picker: UIImagePickerController,
+            didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]
+        ) {
             if let image = info[.originalImage] as? UIImage {
                 onImagePicked(image)
             }

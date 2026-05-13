@@ -51,3 +51,6 @@ xcuserdata/
 
 # Git worktrees
 .worktrees/
+
+# Local runtime store
+data/plants.json

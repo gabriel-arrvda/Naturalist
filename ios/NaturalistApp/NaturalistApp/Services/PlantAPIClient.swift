@@ -37,6 +37,25 @@ struct PlantAPIClient: PlantService {
         return try JSONDecoder().decode(PlantResponse.self, from: data)
     }
 
+    func fetchSavedPlants() async throws -> PlantsResponse {
+        let endpoint = baseURL.appending(path: "plants")
+        var request = URLRequest(url: endpoint)
+        request.httpMethod = "GET"
+
+        let (data, response) = try await session.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw PlantAPIError.invalidResponse
+        }
+
+        guard (200...299).contains(httpResponse.statusCode) else {
+            let message = String(data: data, encoding: .utf8) ?? "Erro desconhecido"
+            throw PlantAPIError.serverError(httpResponse.statusCode, message)
+        }
+
+        return try JSONDecoder().decode(PlantsResponse.self, from: data)
+    }
+
     private func makeMultipartBody(imageData: Data, filename: String, boundary: String) -> Data {
         let sanitizedFilename = sanitizeFilenameForHeader(filename)
         let mimeType = mimeType(for: filename)

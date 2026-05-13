@@ -16,6 +16,10 @@
 		C2D41A442D2C4B3800A10006 /* PlantService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D41A442D2C4B3800A00008 /* PlantService.swift */; };
 		C2D41A452D2C4B3800A10007 /* PlantScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D41A452D2C4B3800A00009 /* PlantScannerView.swift */; };
 		C2D41A462D2C4B3800A10008 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D41A462D2C4B3800A0000A /* Theme.swift */; };
+		C2D41A472D2C4B3800A10009 /* PlantGalleryItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D41A472D2C4B3800A0000B /* PlantGalleryItem.swift */; };
+		C2D41A482D2C4B3800A1000A /* PlantsResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D41A482D2C4B3800A0000C /* PlantsResponse.swift */; };
+		C2D41A492D2C4B3800A1000B /* PlantGalleryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D41A492D2C4B3800A0000D /* PlantGalleryViewModel.swift */; };
+		C2D41A4A2D2C4B3800A1000C /* PlantGalleryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D41A4A2D2C4B3800A0000E /* PlantGalleryView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +34,10 @@
 		C2D41A442D2C4B3800A00008 /* PlantService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlantService.swift; sourceTree = "<group>"; };
 		C2D41A452D2C4B3800A00009 /* PlantScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlantScannerView.swift; sourceTree = "<group>"; };
 		C2D41A462D2C4B3800A0000A /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		C2D41A472D2C4B3800A0000B /* PlantGalleryItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlantGalleryItem.swift; sourceTree = "<group>"; };
+		C2D41A482D2C4B3800A0000C /* PlantsResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlantsResponse.swift; sourceTree = "<group>"; };
+		C2D41A492D2C4B3800A0000D /* PlantGalleryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlantGalleryViewModel.swift; sourceTree = "<group>"; };
+		C2D41A4A2D2C4B3800A0000E /* PlantGalleryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlantGalleryView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,6 +111,8 @@
 			isa = PBXGroup;
 			children = (
 				C2D41A412D2C4B3800A00005 /* PlantResponse.swift */,
+				C2D41A472D2C4B3800A0000B /* PlantGalleryItem.swift */,
+				C2D41A482D2C4B3800A0000C /* PlantsResponse.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -118,9 +128,19 @@
 		C2D41A432D2C4B3800A30009 /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				C2D41A492D2C4B3800A3000D /* Plants */,
 				C2D41A432D2C4B3800A3000A /* Scanner */,
 			);
 			path = Features;
+			sourceTree = "<group>";
+		};
+		C2D41A492D2C4B3800A3000D /* Plants */ = {
+			isa = PBXGroup;
+			children = (
+				C2D41A492D2C4B3800A0000D /* PlantGalleryViewModel.swift */,
+				C2D41A4A2D2C4B3800A0000E /* PlantGalleryView.swift */,
+			);
+			path = Plants;
 			sourceTree = "<group>";
 		};
 		C2D41A432D2C4B3800A3000A /* Scanner */ = {
@@ -225,6 +245,10 @@
 				C2D41A442D2C4B3800A10006 /* PlantService.swift in Sources */,
 				C2D41A452D2C4B3800A10007 /* PlantScannerView.swift in Sources */,
 				C2D41A462D2C4B3800A10008 /* Theme.swift in Sources */,
+				C2D41A472D2C4B3800A10009 /* PlantGalleryItem.swift in Sources */,
+				C2D41A482D2C4B3800A1000A /* PlantsResponse.swift in Sources */,
+				C2D41A492D2C4B3800A1000B /* PlantGalleryViewModel.swift in Sources */,
+				C2D41A4A2D2C4B3800A1000C /* PlantGalleryView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
