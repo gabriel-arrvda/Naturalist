@@ -72,6 +72,23 @@ Servidor disponível em:
 - API: http://127.0.0.1:8000
 - Docs Swagger: http://127.0.0.1:8000/docs
 
+## App iOS (SwiftUI)
+
+- Localização: `ios/NaturalistApp`
+- Requisitos:
+  - Xcode 16+
+  - iOS 18+
+  - API local disponível em `http://127.0.0.1:8000`
+
+### Como executar (iOS)
+
+1. Abra o projeto em `ios/NaturalistApp/NaturalistApp.xcodeproj` no Xcode.
+2. Selecione o scheme **NaturalistApp**.
+3. Escolha o simulador **iPhone 16** (iOS 18+).
+4. Execute o app (`⌘R`).
+5. Na tela principal, capture uma nova imagem ou escolha uma imagem da galeria.
+6. Toque em **Analyze** para enviar a imagem para a API local e visualizar o resultado.
+
 ## Endpoint
 
 ### POST /predict
