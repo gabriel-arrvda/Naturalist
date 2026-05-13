@@ -15,42 +15,59 @@ struct PlantScannerView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                Text("Naturalist")
-                    .font(.largeTitle)
-                    .bold()
-                    .frame(maxWidth: .infinity, alignment: .leading)
+        ZStack {
+            Theme.surface
+                .ignoresSafeArea()
 
-                Button("Fotografar planta") {
-                    if UIImagePickerController.isSourceTypeAvailable(.camera) {
-                        showCamera = true
-                    } else {
-                        showCameraUnavailableAlert = true
+            ScrollView {
+                VStack(spacing: 16) {
+                    Text("Naturalist")
+                        .font(.largeTitle)
+                        .bold()
+                        .foregroundStyle(Theme.darkGreen)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                    Button("Fotografar planta") {
+                        if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                            showCamera = true
+                        } else {
+                            showCameraUnavailableAlert = true
+                        }
                     }
-                }
-                .buttonStyle(.borderedProminent)
-                .frame(maxWidth: .infinity)
+                    .buttonStyle(.borderedProminent)
+                    .buttonBorderShape(.roundedRectangle(radius: 12))
+                    .frame(maxWidth: .infinity)
 
-                PhotosPicker(selection: $pickerItem, matching: .images) {
-                    Text("Escolher da galeria")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.bordered)
-
-                Button("Analisar planta") {
-                    Task {
-                        await viewModel.analyze(imageData: imageData, filename: selectedFilename)
+                    PhotosPicker(selection: $pickerItem, matching: .images) {
+                        Text("Escolher da galeria")
+                            .frame(maxWidth: .infinity)
                     }
-                }
-                .buttonStyle(.borderedProminent)
-                .frame(maxWidth: .infinity)
+                    .buttonStyle(.bordered)
+                    .buttonBorderShape(.roundedRectangle(radius: 12))
 
-                content
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    Button("Analisar planta") {
+                        Task {
+                            await viewModel.analyze(imageData: imageData, filename: selectedFilename)
+                        }
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .buttonBorderShape(.roundedRectangle(radius: 12))
+                    .frame(maxWidth: .infinity)
+
+                    content
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(16)
+                        .background(Color.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .stroke(Theme.primaryGreen.opacity(0.2), lineWidth: 1)
+                        )
+                }
+                .padding()
             }
-            .padding()
         }
+        .tint(Theme.primaryGreen)
         .sheet(isPresented: $showCamera) {
             CameraCaptureView { capturedImage in
                 imageData = normalizedJPEGData(from: capturedImage)
@@ -97,10 +114,17 @@ struct PlantScannerView: View {
             ProgressView("Analisando sua planta...")
         case .success:
             VStack(alignment: .leading, spacing: 8) {
+                Text("Melhor correspondência")
+                    .font(.caption)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(Theme.darkGreen.opacity(0.75))
                 Text(viewModel.bestMatchTitle)
-                    .font(.title3)
-                    .bold()
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .foregroundStyle(Theme.darkGreen)
                 Text(viewModel.summaryText)
+                    .font(.body)
+                    .foregroundStyle(.primary)
             }
         case .error:
             Text(viewModel.errorMessage)

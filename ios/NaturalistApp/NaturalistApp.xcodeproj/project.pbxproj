@@ -14,6 +14,7 @@
 		C2D41A432D2C4B3800A10005 /* PlantScannerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D41A432D2C4B3800A00007 /* PlantScannerViewModel.swift */; };
 		C2D41A442D2C4B3800A10006 /* PlantService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D41A442D2C4B3800A00008 /* PlantService.swift */; };
 		C2D41A452D2C4B3800A10007 /* PlantScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D41A452D2C4B3800A00009 /* PlantScannerView.swift */; };
+		C2D41A462D2C4B3800A10008 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D41A462D2C4B3800A0000A /* Theme.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 		C2D41A432D2C4B3800A00007 /* PlantScannerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlantScannerViewModel.swift; sourceTree = "<group>"; };
 		C2D41A442D2C4B3800A00008 /* PlantService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlantService.swift; sourceTree = "<group>"; };
 		C2D41A452D2C4B3800A00009 /* PlantScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlantScannerView.swift; sourceTree = "<group>"; };
+		C2D41A462D2C4B3800A0000A /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,6 +57,7 @@
 				C2D41A412D2C4B3800A30007 /* Models */,
 				C2D41A422D2C4B3800A30008 /* Utils */,
 				C2D41A432D2C4B3800A30009 /* Features */,
+				C2D41A462D2C4B3800A3000B /* UI */,
 				C2D41A3F2D2C4B3800A30005 /* Resources */,
 			);
 			path = NaturalistApp;
@@ -124,6 +127,22 @@
 				C2D41A452D2C4B3800A00009 /* PlantScannerView.swift */,
 			);
 			path = Scanner;
+			sourceTree = "<group>";
+		};
+		C2D41A462D2C4B3800A3000B /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				C2D41A462D2C4B3800A3000C /* Theme */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		C2D41A462D2C4B3800A3000C /* Theme */ = {
+			isa = PBXGroup;
+			children = (
+				C2D41A462D2C4B3800A0000A /* Theme.swift */,
+			);
+			path = Theme;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -200,6 +219,7 @@
 				C2D41A432D2C4B3800A10005 /* PlantScannerViewModel.swift in Sources */,
 				C2D41A442D2C4B3800A10006 /* PlantService.swift in Sources */,
 				C2D41A452D2C4B3800A10007 /* PlantScannerView.swift in Sources */,
+				C2D41A462D2C4B3800A10008 /* Theme.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
