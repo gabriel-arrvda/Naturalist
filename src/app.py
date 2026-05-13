@@ -190,6 +190,7 @@ def _upsert_saved_plant(
                 "created_at": now,
                 "updated_at": now,
                 "sent_images": [image_metadata],
+                "image_base64": image_metadata["image_base64"],
                 "thumbnail_base64": image_metadata["thumbnail_base64"],
             }
         )
@@ -198,6 +199,7 @@ def _upsert_saved_plant(
         existing["common"] = common_names
         existing["confidence"] = confidence
         existing["updated_at"] = now
+        existing["image_base64"] = image_metadata["image_base64"]
         existing["thumbnail_base64"] = image_metadata["thumbnail_base64"]
         sent_images = existing.setdefault("sent_images", [])
         sent_images.append(image_metadata)
@@ -256,12 +258,14 @@ async def predict(file: UploadFile = File(...)):
         raise HTTPException(status_code=502, detail="Resposta do Pl@ntNet sem bestMatch")
 
     thumbnail_base64 = make_thumbnail_base64(image_bytes)
-    summary = None
+    summary = summarize_plant(best_match) if best_match else None
     image_metadata = {
         "filename": file.filename,
         "content_type": file.content_type,
-        "thumbnail_base64": thumbnail_base64,
+        "size_bytes": len(image_bytes),
         "captured_at": datetime.now(timezone.utc).isoformat(),
+        "image_base64": b64encode(image_bytes).decode("utf-8"),
+        "thumbnail_base64": thumbnail_base64,
     }
 
     firestore_db = _get_firestore_db()
@@ -270,7 +274,6 @@ async def predict(file: UploadFile = File(...)):
         doc = plant_ref.get()
 
         if not doc.exists:
-            summary = summarize_plant(best_match) if best_match else None
             plant_ref.set(
                 {
                     "name": best_match,
@@ -279,13 +282,17 @@ async def predict(file: UploadFile = File(...)):
                     "common": results[0].get("species", {}).get("commonNames", []) if results else [],
                     "confidence": results[0].get("score") if results else None,
                     "sent_images": [image_metadata],
+                    "image_base64": image_metadata["image_base64"],
+                    "thumbnail_base64": image_metadata["thumbnail_base64"],
                 }
             )
         else:
-            summary = (doc.to_dict() or {}).get("summary")
+            summary = (doc.to_dict() or {}).get("summary") or summary
             plant_ref.update(
                 {
                     "sent_images": firestore.ArrayUnion([image_metadata]),
+                    "image_base64": image_metadata["image_base64"],
+                    "thumbnail_base64": image_metadata["thumbnail_base64"],
                     "updated_at": firestore.SERVER_TIMESTAMP,
                 }
             )

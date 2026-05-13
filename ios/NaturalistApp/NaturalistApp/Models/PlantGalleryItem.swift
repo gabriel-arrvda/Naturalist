@@ -6,6 +6,7 @@ struct PlantGalleryItem: Decodable, Identifiable {
     let summary: String?
     let common: [String]
     let confidence: Double?
+    let imageBase64: String?
     let thumbnailBase64: String?
 
     private enum CodingKeys: String, CodingKey {
@@ -14,12 +15,21 @@ struct PlantGalleryItem: Decodable, Identifiable {
         case summary
         case common
         case confidence
+        case imageBase64 = "image_base64"
         case thumbnailBase64 = "thumbnail_base64"
     }
 
     var thumbnailData: Data? {
-        guard let thumbnailBase64 else { return nil }
-        return Data(base64Encoded: thumbnailBase64)
+        if let thumbnailBase64, let data = Data(base64Encoded: thumbnailBase64) {
+            return data
+        }
+        guard let imageBase64 else { return nil }
+        return Data(base64Encoded: imageBase64)
+    }
+
+    var imageData: Data? {
+        guard let imageBase64 else { return nil }
+        return Data(base64Encoded: imageBase64)
     }
 
     var commonName: String {

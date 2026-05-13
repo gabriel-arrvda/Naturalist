@@ -9,6 +9,7 @@ struct PlantScannerView: View {
     @State private var selectedFilename: String = "planta.jpg"
     @State private var showCamera: Bool = false
     @State private var showCameraUnavailableAlert: Bool = false
+    @State private var analysisPresentation: AnalysisPresentation?
 
     init(viewModel: PlantScannerViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -55,6 +56,9 @@ struct PlantScannerView: View {
                     }
                 }
             }
+        }
+        .fullScreenCover(item: $analysisPresentation) { presentation in
+            AnalysisResultView(presentation: presentation)
         }
     }
 
@@ -154,6 +158,14 @@ struct PlantScannerView: View {
         Button {
             Task {
                 await viewModel.analyze(imageData: imageData, filename: selectedFilename)
+                await MainActor.run {
+                    guard viewModel.state == .success, let imageData else { return }
+                    analysisPresentation = AnalysisPresentation(
+                        imageData: imageData,
+                        title: viewModel.bestMatchTitle,
+                        summary: viewModel.summaryText
+                    )
+                }
             }
         } label: {
             Label("Analisar planta", systemImage: "sparkles")
@@ -198,6 +210,102 @@ struct PlantScannerView: View {
             return nil
         }
         return normalizedJPEGData(from: image)
+    }
+}
+
+private struct AnalysisPresentation: Identifiable {
+    let id = UUID()
+    let imageData: Data
+    let title: String
+    let summary: String
+}
+
+private struct AnalysisResultView: View {
+    let presentation: AnalysisPresentation
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 18) {
+                    heroImage
+                    summaryCard
+                }
+                .padding()
+            }
+            .background(Theme.surface.ignoresSafeArea())
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Fechar") {
+                        dismiss()
+                    }
+                    .fontWeight(.semibold)
+                }
+            }
+            .navigationTitle("Resultado")
+            .navigationBarTitleDisplayMode(.inline)
+        }
+    }
+
+    private var heroImage: some View {
+        ZStack(alignment: .bottomLeading) {
+            if let uiImage = UIImage(data: presentation.imageData) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 360)
+            } else {
+                RoundedRectangle(cornerRadius: 28, style: .continuous)
+                    .fill(Theme.surface)
+                    .frame(height: 360)
+                    .overlay(Image(systemName: "photo").font(.largeTitle).foregroundStyle(Theme.primaryGreen))
+            }
+
+            LinearGradient(
+                colors: [.clear, .black.opacity(0.55)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Identificação concluída")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.white.opacity(0.9))
+                Text(presentation.title)
+                    .font(.title.bold())
+                    .foregroundStyle(.white)
+            }
+            .padding(20)
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+    }
+
+    private var summaryCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Resumo")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(Theme.primaryGreen)
+            Text(presentation.summary)
+                .font(.body)
+                .foregroundStyle(.primary)
+                .fixedSize(horizontal: false, vertical: true)
+            Button {
+                dismiss()
+            } label: {
+                Label("Fechar", systemImage: "xmark")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .padding(.top, 8)
+        }
+        .padding(20)
+        .background(Theme.cardBackground)
+        .overlay(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .stroke(Theme.cardBorder, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
     }
 }
 
