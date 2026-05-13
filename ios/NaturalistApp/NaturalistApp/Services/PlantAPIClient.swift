@@ -38,12 +38,42 @@ struct PlantAPIClient {
     }
 
     private func makeMultipartBody(imageData: Data, filename: String, boundary: String) -> Data {
+        let sanitizedFilename = sanitizeFilenameForHeader(filename)
+        let mimeType = mimeType(for: filename)
+
         var body = Data()
         body.append("--\(boundary)\r\n".data(using: .utf8)!)
-        body.append("Content-Disposition: form-data; name=\"file\"; filename=\"\(filename)\"\r\n".data(using: .utf8)!)
-        body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"file\"; filename=\"\(sanitizedFilename)\"\r\n".data(using: .utf8)!)
+        body.append("Content-Type: \(mimeType)\r\n\r\n".data(using: .utf8)!)
         body.append(imageData)
         body.append("\r\n--\(boundary)--\r\n".data(using: .utf8)!)
         return body
+    }
+
+    private func mimeType(for filename: String) -> String {
+        let ext = URL(fileURLWithPath: filename).pathExtension.lowercased()
+        switch ext {
+        case "jpg", "jpeg":
+            return "image/jpeg"
+        case "png":
+            return "image/png"
+        case "heic":
+            return "image/heic"
+        case "heif":
+            return "image/heif"
+        case "webp":
+            return "image/webp"
+        default:
+            return "application/octet-stream"
+        }
+    }
+
+    private func sanitizeFilenameForHeader(_ filename: String) -> String {
+        let dangerousCharacters = CharacterSet(charactersIn: "\"\r\n/\\;")
+        let sanitizedScalars = filename.unicodeScalars.map { scalar in
+            dangerousCharacters.contains(scalar) ? "_" : Character(scalar)
+        }
+        let sanitized = String(sanitizedScalars)
+        return sanitized.isEmpty ? "upload.bin" : sanitized
     }
 }
