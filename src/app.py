@@ -1,11 +1,15 @@
+import json
+from base64 import b64encode
 from io import BytesIO
 import logging
 import os
+from pathlib import Path
 import time
-from typing import Optional
+from typing import Any, Optional
 
 import requests
 import google.generativeai as genai
+from PIL import Image
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
@@ -43,6 +47,7 @@ API_QUERY_PARAMS = {
 LLM_API_KEY = os.getenv("LLM_API_KEY")
 LLM_MODEL = os.getenv("LLM_MODEL", "gemini-1.5-flash")
 LLM_CLIENT = None
+PLANTS_STORE_PATH = Path(os.getenv("PLANTS_STORE_PATH", "data/plants.json"))
 
 
 def _get_gemini_client() -> genai.GenerativeModel:
@@ -94,6 +99,81 @@ def _log_request_exception(message: str) -> None:
     logger.exception("%s", message)
 
 
+def make_thumbnail_base64(image_bytes: bytes, max_size: tuple[int, int] = (512, 512)) -> str:
+    image = Image.open(BytesIO(image_bytes)).convert("RGB")
+    image.thumbnail(max_size)
+
+    buffer = BytesIO()
+    image.save(buffer, format="JPEG", quality=82, optimize=True)
+    return b64encode(buffer.getvalue()).decode("utf-8")
+
+
+def _load_saved_plants() -> list[dict[str, Any]]:
+    if not PLANTS_STORE_PATH.exists():
+        return []
+
+    raw = PLANTS_STORE_PATH.read_text(encoding="utf-8").strip()
+    if not raw:
+        return []
+
+    try:
+        payload = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise HTTPException(status_code=500, detail="Arquivo local de plantas está inválido") from exc
+
+    if not isinstance(payload, list):
+        raise HTTPException(status_code=500, detail="Arquivo local de plantas está corrompido")
+
+    return payload
+
+
+def _save_saved_plants(plants: list[dict[str, Any]]) -> None:
+    PLANTS_STORE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    tmp_path = PLANTS_STORE_PATH.with_suffix(".tmp")
+    tmp_path.write_text(json.dumps(plants, ensure_ascii=False, indent=2), encoding="utf-8")
+    tmp_path.replace(PLANTS_STORE_PATH)
+
+
+def _upsert_saved_plant(
+    *,
+    best_match: str,
+    summary: Optional[str],
+    results: list[dict[str, Any]],
+    image_metadata: dict[str, Any],
+) -> None:
+    plants = _load_saved_plants()
+    now = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    species = results[0].get("species", {}) if results else {}
+    common_names = species.get("commonNames", []) if isinstance(species, dict) else []
+    confidence = results[0].get("score") if results else None
+
+    existing = next((plant for plant in plants if plant.get("name") == best_match), None)
+    if existing is None:
+        plants.append(
+            {
+                "id": best_match,
+                "name": best_match,
+                "summary": summary,
+                "common": common_names,
+                "confidence": confidence,
+                "created_at": now,
+                "updated_at": now,
+                "sent_images": [image_metadata],
+                "thumbnail_base64": image_metadata["thumbnail_base64"],
+            }
+        )
+    else:
+        existing["summary"] = summary
+        existing["common"] = common_names
+        existing["confidence"] = confidence
+        existing["updated_at"] = now
+        existing["thumbnail_base64"] = image_metadata["thumbnail_base64"]
+        sent_images = existing.setdefault("sent_images", [])
+        sent_images.append(image_metadata)
+
+    _save_saved_plants(plants)
+
+
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
     if not API_KEY:
@@ -141,6 +221,20 @@ async def predict(file: UploadFile = File(...)):
     results = response_data.get("results", [])
     best_match = response_data.get("bestMatch")
     summary = summarize_plant(best_match) if best_match else None
+    thumbnail_base64 = make_thumbnail_base64(image_bytes)
+    if best_match:
+        _upsert_saved_plant(
+            best_match=best_match,
+            summary=summary,
+            results=results,
+            image_metadata={
+                "filename": file.filename,
+                "content_type": file.content_type,
+                "size_bytes": len(image_bytes),
+                "uploaded_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                "thumbnail_base64": thumbnail_base64,
+            },
+        )
 
     return {
         "melhor_correspondencia": best_match,
@@ -158,6 +252,12 @@ async def predict(file: UploadFile = File(...)):
             for item in results
         ],
     }
+
+
+@app.get("/plants")
+def list_saved_plants():
+    plants = _load_saved_plants()
+    return {"total": len(plants), "plants": plants}
 
 
 # Fluxo antigo preservado para a futura volta do FAISS/modelo próprio.
