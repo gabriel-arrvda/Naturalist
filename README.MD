@@ -22,6 +22,10 @@ Naturalist/
 ├── data/
 │   ├── labels.npy
 │   └── plants.index
+├── ios/
+│   └── NaturalistApp/
+│       ├── NaturalistApp
+│       └── NaturalistApp.xcodeproj
 ├── notebooks/
 │   └── plant_recognition_clip_faiss.ipynb
 └── src/
@@ -87,7 +91,7 @@ Servidor disponível em:
 3. Escolha o simulador **iPhone 16** (iOS 18+).
 4. Execute o app (`⌘R`).
 5. Na tela principal, capture uma nova imagem ou escolha uma imagem da galeria.
-6. Toque em **Analyze** para enviar a imagem para a API local e visualizar o resultado.
+6. Toque em **Analisar planta** para enviar a imagem para a API local e visualizar o resultado.
 
 ## Endpoint
 
