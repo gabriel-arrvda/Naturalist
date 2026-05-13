@@ -86,9 +86,11 @@ struct PlantScannerView: View {
             guard let newItem else { return }
             Task {
                 let loadedData = try? await newItem.loadTransferable(type: Data.self)
-                imageData = normalizedJPEGData(from: loadedData)
-                if imageData != nil {
-                    selectedFilename = "galeria.jpg"
+                await MainActor.run {
+                    imageData = normalizedJPEGData(from: loadedData)
+                    if imageData != nil {
+                        selectedFilename = "galeria.jpg"
+                    }
                 }
             }
         }
