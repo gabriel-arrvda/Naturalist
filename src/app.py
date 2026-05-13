@@ -1,6 +1,7 @@
 import json
 from base64 import b64encode
 from io import BytesIO
+from datetime import datetime, timezone
 import logging
 import os
 from pathlib import Path
@@ -13,6 +14,13 @@ from PIL import Image
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
+
+import firebase_admin
+from firebase_admin import credentials, firestore
+
+cred = credentials.Certificate("serviceAccountKey.json")
+firebase_admin.initialize_app(cred)
+db = firestore.client()
 
 load_dotenv()
 
@@ -220,20 +228,34 @@ async def predict(file: UploadFile = File(...)):
     response_data = response.json()
     results = response_data.get("results", [])
     best_match = response_data.get("bestMatch")
-    summary = summarize_plant(best_match) if best_match else None
+
+    if not best_match:
+        raise HTTPException(status_code=502, detail="Resposta do Pl@ntNet sem bestMatch")
+
     thumbnail_base64 = make_thumbnail_base64(image_bytes)
-    if best_match:
-        _upsert_saved_plant(
-            best_match=best_match,
-            summary=summary,
-            results=results,
-            image_metadata={
-                "filename": file.filename,
-                "content_type": file.content_type,
-                "size_bytes": len(image_bytes),
-                "uploaded_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-                "thumbnail_base64": thumbnail_base64,
-            },
+
+    plant_ref = db.collection("plants").document(best_match)
+    doc = plant_ref.get()
+
+    summary = None
+
+    if not doc.exists:
+        summary = summarize_plant(best_match) if best_match else None
+        plant_ref.set({
+            "name": best_match, 
+            "created_at": firestore.SERVER_TIMESTAMP, 
+            "summary": summary, 
+            "common": results[0].get("species", {}).get("commonNames", []) if results else [],
+            "confidence": results[0].get("score") if results else None,
+            "sent_images": [image_metadata],
+        })
+    else:
+        summary = doc.to_dict().get("summary")
+        plant_ref.update(
+            {
+                "sent_images": firestore.ArrayUnion([image_metadata]),
+                "updated_at": firestore.SERVER_TIMESTAMP,
+            }
         )
 
     return {
@@ -256,7 +278,24 @@ async def predict(file: UploadFile = File(...)):
 
 @app.get("/plants")
 def list_saved_plants():
-    plants = _load_saved_plants()
+    docs = db.collection("plants").stream()
+
+    plants: list[dict[str, Any]] = []
+    for doc in docs:
+        data = doc.to_dict() or {}
+        plants.append(
+            {
+                "id": doc.id,
+                "name": data.get("name"),
+                "summary": data.get("summary"),
+                "common": data.get("common", []),
+                "confidence": data.get("confidence"),
+                "created_at": str(data.get("created_at")) if data.get("created_at") else None,
+                "updated_at": str(data.get("updated_at")) if data.get("updated_at") else None,
+                "sent_images": data.get("sent_images", []),
+            }
+        )
+
     return {"total": len(plants), "plants": plants}
 
 

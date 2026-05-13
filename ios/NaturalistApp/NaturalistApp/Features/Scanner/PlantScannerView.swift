@@ -268,3 +268,14 @@ private struct CameraCaptureView: UIViewControllerRepresentable {
         }
     }
 }
+
+#Preview("PlantScanner - Mock") {
+    // Use um view model de mock para o preview
+    PlantScannerView(
+        viewModel: PlantScannerViewModel(
+            service: PlantAPIClient(
+                baseURL: URL(string: "http://127.0.0.1:8000")!
+            )
+        )
+    )
+}

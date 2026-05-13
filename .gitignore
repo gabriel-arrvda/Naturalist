@@ -1,5 +1,15 @@
 # Environment variables
 .env
+.env.*
+!.env.example
+
+# Firebase secrets and local logs
+serviceAccountKey.json
+firebase-debug.log*
+*.firebaseio.log
+
+.agents/
+skills-lock.json
 
 # Python
 __pycache__/
@@ -34,6 +44,10 @@ htmlcov/
 # Editor settings
 .vscode/
 .idea/
+
+# Xcode user-specific files
+*.xcuserstate
+xcuserdata/
 
 # Git worktrees
 .worktrees/
