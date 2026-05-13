@@ -1,5 +1,5 @@
 import json
-from base64 import b64encode
+from base64 import b64encode, b64decode
 from io import BytesIO
 from datetime import datetime, timezone
 import logging
@@ -17,11 +17,12 @@ from dotenv import load_dotenv
 
 try:
     import firebase_admin
-    from firebase_admin import credentials, firestore
+    from firebase_admin import credentials, firestore, storage
 except Exception:  # pragma: no cover - dependency is optional for local runs
     firebase_admin = None
     credentials = None
     firestore = None
+    storage = None
 
 db = None
 
@@ -72,8 +73,22 @@ def _get_firestore_db():
 
     try:
         if not firebase_admin._apps:
-            cred = credentials.Certificate("serviceAccountKey.json")
-            firebase_admin.initialize_app(cred)
+            cred_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS", "serviceAccountKey.json")
+            cred = credentials.Certificate(cred_path)
+            storage_bucket = os.getenv("FIREBASE_STORAGE_BUCKET")
+            # sanitize bucket value in case user provided a gs:// URL
+            if storage_bucket:
+                storage_bucket = storage_bucket.strip()
+                if storage_bucket.startswith("gs://"):
+                    storage_bucket = storage_bucket[5:]
+                storage_bucket = storage_bucket.rstrip("/")
+
+            if storage_bucket:
+                firebase_admin.initialize_app(cred, {"storageBucket": storage_bucket})
+                logger.info("Inicializando Firebase com bucket %s", storage_bucket)
+            else:
+                firebase_admin.initialize_app(cred)
+                logger.info("Inicializando Firebase sem bucket de storage configurado")
         db = firestore.client()
         return db
     except Exception:
@@ -171,40 +186,87 @@ def _upsert_saved_plant(
     summary: Optional[str],
     results: list[dict[str, Any]],
     image_metadata: dict[str, Any],
+    image_bytes: bytes,
+    thumbnail_bytes: bytes,
 ) -> None:
-    plants = _load_saved_plants()
-    now = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    """
+    Persist plant record exclusively to Firestore and Storage. Raises Exception if Firestore/Storage not configured or on write errors.
+    """
+    firestore_db = _get_firestore_db()
+    if firestore_db is None:
+        raise RuntimeError("Firestore não está configurado. Configure o Firebase para persistência remota.")
+
+    # Prepare basic fields
     species = results[0].get("species", {}) if results else {}
     common_names = species.get("commonNames", []) if isinstance(species, dict) else []
     confidence = results[0].get("score") if results else None
 
-    existing = next((plant for plant in plants if plant.get("name") == best_match), None)
-    if existing is None:
-        plants.append(
+    # Upload images to Firebase Storage (expects firebase_admin.storage initialized)
+    image_url = None
+    thumbnail_url = None
+    try:
+        from firebase_admin import storage as fb_storage
+
+        bucket = fb_storage.bucket(app=firebase_admin.get_app())
+        filename = image_metadata.get("filename") or f"{int(time.time())}.jpg"
+        safe_name = f"{best_match}/{int(time.time())}_{filename}"
+
+        blob = bucket.blob(safe_name)
+        blob.upload_from_string(image_bytes, content_type=image_metadata.get("content_type", "image/jpeg"))
+        try:
+            blob.make_public()
+            image_url = blob.public_url
+        except Exception:
+            image_url = None
+
+        thumb_name = safe_name + "_thumb.jpg"
+        thumb_blob = bucket.blob(thumb_name)
+        thumb_blob.upload_from_string(thumbnail_bytes, content_type="image/jpeg")
+        try:
+            thumb_blob.make_public()
+            thumbnail_url = thumb_blob.public_url
+        except Exception:
+            thumbnail_url = None
+    except Exception as e:
+        logger.exception("Falha ao enviar imagens para Storage: %s", e)
+        # Fail fast: raise so caller knows persistence failed
+        raise
+
+    # Build sent entry with only primitives
+    sent_entry = {
+        "filename": image_metadata.get("filename"),
+        "content_type": image_metadata.get("content_type"),
+        "size_bytes": int(image_metadata.get("size_bytes") or 0),
+        "captured_at": image_metadata.get("captured_at"),
+        "image_url": image_url,
+        "thumbnail_url": thumbnail_url,
+    }
+
+    plant_ref = firestore_db.collection("plants").document(best_match)
+    doc = plant_ref.get()
+
+    if not doc.exists:
+        plant_ref.set(
             {
-                "id": best_match,
                 "name": best_match,
+                "created_at": firestore.SERVER_TIMESTAMP,
                 "summary": summary,
-                "common": common_names,
-                "confidence": confidence,
-                "created_at": now,
-                "updated_at": now,
-                "sent_images": [image_metadata],
-                "image_base64": image_metadata["image_base64"],
-                "thumbnail_base64": image_metadata["thumbnail_base64"],
+                "common": [str(n) for n in common_names],
+                "confidence": float(confidence) if confidence is not None else None,
+                "sent_images": [sent_entry],
+                "image_url": image_url,
+                "thumbnail_url": thumbnail_url,
             }
         )
     else:
-        existing["summary"] = summary
-        existing["common"] = common_names
-        existing["confidence"] = confidence
-        existing["updated_at"] = now
-        existing["image_base64"] = image_metadata["image_base64"]
-        existing["thumbnail_base64"] = image_metadata["thumbnail_base64"]
-        sent_images = existing.setdefault("sent_images", [])
-        sent_images.append(image_metadata)
-
-    _save_saved_plants(plants)
+        plant_ref.update(
+            {
+                "sent_images": firestore.ArrayUnion([sent_entry]),
+                "image_url": image_url,
+                "thumbnail_url": thumbnail_url,
+                "updated_at": firestore.SERVER_TIMESTAMP,
+            }
+        )
 
 
 @app.post("/predict")
@@ -254,55 +316,38 @@ async def predict(file: UploadFile = File(...)):
     results = response_data.get("results", [])
     best_match = response_data.get("bestMatch")
 
-    if not best_match:
-        raise HTTPException(status_code=502, detail="Resposta do Pl@ntNet sem bestMatch")
-
     thumbnail_base64 = make_thumbnail_base64(image_bytes)
     summary = summarize_plant(best_match) if best_match else None
+
+    # Require Firestore configured (we no longer persist locally)
+    firestore_db = _get_firestore_db()
+    if firestore_db is None:
+        raise HTTPException(status_code=500, detail="Firestore não configurado. Configure o Firebase para persistência remota.")
+
     image_metadata = {
         "filename": file.filename,
         "content_type": file.content_type,
         "size_bytes": len(image_bytes),
         "captured_at": datetime.now(timezone.utc).isoformat(),
-        "image_base64": b64encode(image_bytes).decode("utf-8"),
-        "thumbnail_base64": thumbnail_base64,
     }
 
-    firestore_db = _get_firestore_db()
-    if firestore_db is not None:
-        plant_ref = firestore_db.collection("plants").document(best_match)
-        doc = plant_ref.get()
+    # Prepare bytes for upload
+    thumbnail_bytes = b64decode(thumbnail_base64)
 
-        if not doc.exists:
-            plant_ref.set(
-                {
-                    "name": best_match,
-                    "created_at": firestore.SERVER_TIMESTAMP,
-                    "summary": summary,
-                    "common": results[0].get("species", {}).get("commonNames", []) if results else [],
-                    "confidence": results[0].get("score") if results else None,
-                    "sent_images": [image_metadata],
-                    "image_base64": image_metadata["image_base64"],
-                    "thumbnail_base64": image_metadata["thumbnail_base64"],
-                }
-            )
-        else:
-            summary = (doc.to_dict() or {}).get("summary") or summary
-            plant_ref.update(
-                {
-                    "sent_images": firestore.ArrayUnion([image_metadata]),
-                    "image_base64": image_metadata["image_base64"],
-                    "thumbnail_base64": image_metadata["thumbnail_base64"],
-                    "updated_at": firestore.SERVER_TIMESTAMP,
-                }
-            )
+    try:
+        _upsert_saved_plant(
+            best_match=best_match,
+            summary=summary,
+            results=results,
+            image_metadata=image_metadata,
+            image_bytes=image_bytes,
+            thumbnail_bytes=thumbnail_bytes,
+        )
+        firestore_warning = None
+    except Exception as e:
+        logger.exception("Erro ao persistir em Firestore/Storage: %s", e)
+        raise HTTPException(status_code=500, detail=f"Falha ao persistir em Firestore/Storage: {e}")
 
-    _upsert_saved_plant(
-        best_match=best_match,
-        summary=summary,
-        results=results,
-        image_metadata=image_metadata,
-    )
 
     return {
         "melhor_correspondencia": best_match,
@@ -319,46 +364,33 @@ async def predict(file: UploadFile = File(...)):
             }
             for item in results
         ],
+        "firestore_warning": firestore_warning,
     }
 
 
 @app.get("/plants")
 def list_saved_plants():
-    plants: list[dict[str, Any]] = []
     firestore_db = _get_firestore_db()
+    if firestore_db is None:
+        raise HTTPException(status_code=500, detail="Firestore não configurado. Configure o Firebase para usar este endpoint.")
 
-    if firestore_db is not None:
-        docs = firestore_db.collection("plants").stream()
+    plants: list[dict[str, Any]] = []
+    docs = firestore_db.collection("plants").stream()
 
-        for doc in docs:
-            data = doc.to_dict() or {}
-            plants.append(
-                {
-                    "id": doc.id,
-                    "name": data.get("name"),
-                    "summary": data.get("summary"),
-                    "common": data.get("common", []),
-                    "confidence": data.get("confidence"),
-                    "created_at": str(data.get("created_at")) if data.get("created_at") else None,
-                    "updated_at": str(data.get("updated_at")) if data.get("updated_at") else None,
-                    "sent_images": data.get("sent_images", []),
-                }
-            )
-
-    if not plants:
-        for plant in _load_saved_plants():
-            plants.append(
-                {
-                    "id": plant.get("id"),
-                    "name": plant.get("name"),
-                    "summary": plant.get("summary"),
-                    "common": plant.get("common", []),
-                    "confidence": plant.get("confidence"),
-                    "created_at": plant.get("created_at"),
-                    "updated_at": plant.get("updated_at"),
-                    "sent_images": plant.get("sent_images", []),
-                }
-            )
+    for doc in docs:
+        data = doc.to_dict() or {}
+        plants.append(
+            {
+                "id": doc.id,
+                "name": data.get("name"),
+                "summary": data.get("summary"),
+                "common": data.get("common", []),
+                "confidence": data.get("confidence"),
+                "created_at": str(data.get("created_at")) if data.get("created_at") else None,
+                "updated_at": str(data.get("updated_at")) if data.get("updated_at") else None,
+                "sent_images": data.get("sent_images", []),
+            }
+        )
 
     return {"total": len(plants), "plants": plants}
 

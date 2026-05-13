@@ -31,6 +31,26 @@ struct PlantScannerView: View {
             .navigationTitle("Naturalist")
         }
         .tint(Theme.primaryGreen)
+            .overlay(
+                Group {
+                    if viewModel.state == .loading {
+                        ZStack {
+                            Color.black.opacity(0.28).ignoresSafeArea()
+                            VStack(spacing: 12) {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: Theme.primaryGreen))
+                                    .scaleEffect(1.2)
+                                Text("Analisando imagem...")
+                                    .font(.headline)
+                                    .foregroundStyle(.white)
+                            }
+                            .padding(18)
+                            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+                        }
+                        .transition(.opacity)
+                    }
+                }
+            )
         .sheet(isPresented: $showCamera) {
             CameraCaptureView { capturedImage in
                 imageData = normalizedJPEGData(from: capturedImage)
@@ -116,11 +136,21 @@ struct PlantScannerView: View {
 
             Group {
                 if let imageData, let uiImage = UIImage(data: imageData) {
-                    Image(uiImage: uiImage)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 250)
+                    if uiImage.size.width > uiImage.size.height * 1.3 {
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 250)
+                            .clipped()
+                    } else {
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 250)
+                            .clipped()
+                    }
                 } else {
                     ZStack {
                         RoundedRectangle(cornerRadius: 22, style: .continuous)
@@ -165,6 +195,13 @@ struct PlantScannerView: View {
                         title: viewModel.bestMatchTitle,
                         summary: viewModel.summaryText
                     )
+
+                    // Post a notification so other views (Plants) can show a snackbar/banner
+                    NotificationCenter.default.post(name: Notification.Name("PlantSavedNotification"), object: nil, userInfo: [
+                        "imageData": imageData,
+                        "title": viewModel.bestMatchTitle ?? "",
+                        "summary": viewModel.summaryText ?? ""
+                    ])
                 }
             }
         } label: {
@@ -250,11 +287,21 @@ private struct AnalysisResultView: View {
     private var heroImage: some View {
         ZStack(alignment: .bottomLeading) {
             if let uiImage = UIImage(data: presentation.imageData) {
-                Image(uiImage: uiImage)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 360)
+                if uiImage.size.width > uiImage.size.height * 1.3 {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 360)
+                        .clipped()
+                } else {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 360)
+                        .clipped()
+                }
             } else {
                 RoundedRectangle(cornerRadius: 28, style: .continuous)
                     .fill(Theme.surface)
