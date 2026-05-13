@@ -90,8 +90,9 @@ Servidor disponível em:
 2. Selecione o scheme **NaturalistApp**.
 3. Escolha o simulador **iPhone 16** (iOS 18+).
 4. Execute o app (`⌘R`).
-5. Na tela principal, capture uma nova imagem ou escolha uma imagem da galeria.
+5. Use a aba **Scanner** para capturar ou escolher uma imagem da galeria.
 6. Toque em **Analisar planta** para enviar a imagem para a API local e visualizar o resultado.
+7. Use a aba **Plantas** para ver o histórico salvo com foto, nome comum e resumo.
 
 ## Endpoint
 
@@ -125,10 +126,21 @@ curl -X POST "http://127.0.0.1:8000/predict" \
 }
 ```
 
+### GET /plants
+
+Retorna o feed das plantas já buscadas, incluindo a última thumbnail salva de cada registro.
+
+#### Exemplo com curl
+
+```bash
+curl http://127.0.0.1:8000/plants
+```
+
 ## Observações importantes
 
 - O fluxo principal passa a depender da API do Pl@ntNet enquanto o modelo treinado no notebook fica em espera.
 - Se quiser alterar caminhos locais ou credenciais, use o arquivo `.env`.
+- O histórico de plantas fica salvo localmente em `data/plants.json`.
 - O projeto usa GPU automaticamente quando CUDA está disponível; caso contrário, roda em CPU.
 
 ## Desenvolvimento
