@@ -5,7 +5,7 @@ enum PlantAPIError: Error {
     case serverError(Int, String)
 }
 
-struct PlantAPIClient {
+struct PlantAPIClient: PlantService {
     let baseURL: URL
     let session: URLSession
 

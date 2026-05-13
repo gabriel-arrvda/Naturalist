@@ -10,6 +10,8 @@
 		C2D41A3F2D2C4B3800A10001 /* NaturalistApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D41A3F2D2C4B3800A00001 /* NaturalistApp.swift */; };
 		C2D41A402D2C4B3800A10002 /* PlantAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D41A402D2C4B3800A00004 /* PlantAPIClient.swift */; };
 		C2D41A412D2C4B3800A10003 /* PlantResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D41A412D2C4B3800A00005 /* PlantResponse.swift */; };
+		C2D41A422D2C4B3800A10004 /* SummaryFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D41A422D2C4B3800A00006 /* SummaryFormatter.swift */; };
+		C2D41A432D2C4B3800A10005 /* PlantScannerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D41A432D2C4B3800A00007 /* PlantScannerViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -18,6 +20,8 @@
 		C2D41A3F2D2C4B3800A00003 /* NaturalistApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NaturalistApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C2D41A402D2C4B3800A00004 /* PlantAPIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlantAPIClient.swift; sourceTree = "<group>"; };
 		C2D41A412D2C4B3800A00005 /* PlantResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlantResponse.swift; sourceTree = "<group>"; };
+		C2D41A422D2C4B3800A00006 /* SummaryFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryFormatter.swift; sourceTree = "<group>"; };
+		C2D41A432D2C4B3800A00007 /* PlantScannerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlantScannerViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -45,6 +49,8 @@
 				C2D41A3F2D2C4B3800A30004 /* App */,
 				C2D41A402D2C4B3800A30006 /* Services */,
 				C2D41A412D2C4B3800A30007 /* Models */,
+				C2D41A422D2C4B3800A30008 /* Utils */,
+				C2D41A432D2C4B3800A30009 /* Features */,
 				C2D41A3F2D2C4B3800A30005 /* Resources */,
 			);
 			path = NaturalistApp;
@@ -88,6 +94,30 @@
 				C2D41A412D2C4B3800A00005 /* PlantResponse.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		C2D41A422D2C4B3800A30008 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				C2D41A422D2C4B3800A00006 /* SummaryFormatter.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		C2D41A432D2C4B3800A30009 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				C2D41A432D2C4B3800A3000A /* Scanner */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		C2D41A432D2C4B3800A3000A /* Scanner */ = {
+			isa = PBXGroup;
+			children = (
+				C2D41A432D2C4B3800A00007 /* PlantScannerViewModel.swift */,
+			);
+			path = Scanner;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -160,6 +190,8 @@
 				C2D41A3F2D2C4B3800A10001 /* NaturalistApp.swift in Sources */,
 				C2D41A402D2C4B3800A10002 /* PlantAPIClient.swift in Sources */,
 				C2D41A412D2C4B3800A10003 /* PlantResponse.swift in Sources */,
+				C2D41A422D2C4B3800A10004 /* SummaryFormatter.swift in Sources */,
+				C2D41A432D2C4B3800A10005 /* PlantScannerViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
