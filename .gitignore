@@ -11,6 +11,8 @@ firebase-debug.log*
 .agents/
 skills-lock.json
 
+.superpowers/
+
 # Python
 __pycache__/
 *.py[cod]

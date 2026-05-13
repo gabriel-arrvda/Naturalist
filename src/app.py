@@ -15,12 +15,15 @@ from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
-import firebase_admin
-from firebase_admin import credentials, firestore
+try:
+    import firebase_admin
+    from firebase_admin import credentials, firestore
+except Exception:  # pragma: no cover - dependency is optional for local runs
+    firebase_admin = None
+    credentials = None
+    firestore = None
 
-cred = credentials.Certificate("serviceAccountKey.json")
-firebase_admin.initialize_app(cred)
-db = firestore.client()
+db = None
 
 load_dotenv()
 
@@ -56,6 +59,26 @@ LLM_API_KEY = os.getenv("LLM_API_KEY")
 LLM_MODEL = os.getenv("LLM_MODEL", "gemini-1.5-flash")
 LLM_CLIENT = None
 PLANTS_STORE_PATH = Path(os.getenv("PLANTS_STORE_PATH", "data/plants.json"))
+
+
+def _get_firestore_db():
+    global db
+    if db is not None:
+        return db
+
+    if firebase_admin is None or credentials is None or firestore is None:
+        logger.warning("firebase-admin indisponível; persistência remota desativada")
+        return None
+
+    try:
+        if not firebase_admin._apps:
+            cred = credentials.Certificate("serviceAccountKey.json")
+            firebase_admin.initialize_app(cred)
+        db = firestore.client()
+        return db
+    except Exception:
+        logger.exception("Falha ao inicializar Firestore; persistência remota desativada")
+        return None
 
 
 def _get_gemini_client() -> genai.GenerativeModel:
@@ -233,30 +256,46 @@ async def predict(file: UploadFile = File(...)):
         raise HTTPException(status_code=502, detail="Resposta do Pl@ntNet sem bestMatch")
 
     thumbnail_base64 = make_thumbnail_base64(image_bytes)
-
-    plant_ref = db.collection("plants").document(best_match)
-    doc = plant_ref.get()
-
     summary = None
+    image_metadata = {
+        "filename": file.filename,
+        "content_type": file.content_type,
+        "thumbnail_base64": thumbnail_base64,
+        "captured_at": datetime.now(timezone.utc).isoformat(),
+    }
 
-    if not doc.exists:
-        summary = summarize_plant(best_match) if best_match else None
-        plant_ref.set({
-            "name": best_match, 
-            "created_at": firestore.SERVER_TIMESTAMP, 
-            "summary": summary, 
-            "common": results[0].get("species", {}).get("commonNames", []) if results else [],
-            "confidence": results[0].get("score") if results else None,
-            "sent_images": [image_metadata],
-        })
-    else:
-        summary = doc.to_dict().get("summary")
-        plant_ref.update(
-            {
-                "sent_images": firestore.ArrayUnion([image_metadata]),
-                "updated_at": firestore.SERVER_TIMESTAMP,
-            }
-        )
+    firestore_db = _get_firestore_db()
+    if firestore_db is not None:
+        plant_ref = firestore_db.collection("plants").document(best_match)
+        doc = plant_ref.get()
+
+        if not doc.exists:
+            summary = summarize_plant(best_match) if best_match else None
+            plant_ref.set(
+                {
+                    "name": best_match,
+                    "created_at": firestore.SERVER_TIMESTAMP,
+                    "summary": summary,
+                    "common": results[0].get("species", {}).get("commonNames", []) if results else [],
+                    "confidence": results[0].get("score") if results else None,
+                    "sent_images": [image_metadata],
+                }
+            )
+        else:
+            summary = (doc.to_dict() or {}).get("summary")
+            plant_ref.update(
+                {
+                    "sent_images": firestore.ArrayUnion([image_metadata]),
+                    "updated_at": firestore.SERVER_TIMESTAMP,
+                }
+            )
+
+    _upsert_saved_plant(
+        best_match=best_match,
+        summary=summary,
+        results=results,
+        image_metadata=image_metadata,
+    )
 
     return {
         "melhor_correspondencia": best_match,
@@ -278,23 +317,41 @@ async def predict(file: UploadFile = File(...)):
 
 @app.get("/plants")
 def list_saved_plants():
-    docs = db.collection("plants").stream()
-
     plants: list[dict[str, Any]] = []
-    for doc in docs:
-        data = doc.to_dict() or {}
-        plants.append(
-            {
-                "id": doc.id,
-                "name": data.get("name"),
-                "summary": data.get("summary"),
-                "common": data.get("common", []),
-                "confidence": data.get("confidence"),
-                "created_at": str(data.get("created_at")) if data.get("created_at") else None,
-                "updated_at": str(data.get("updated_at")) if data.get("updated_at") else None,
-                "sent_images": data.get("sent_images", []),
-            }
-        )
+    firestore_db = _get_firestore_db()
+
+    if firestore_db is not None:
+        docs = firestore_db.collection("plants").stream()
+
+        for doc in docs:
+            data = doc.to_dict() or {}
+            plants.append(
+                {
+                    "id": doc.id,
+                    "name": data.get("name"),
+                    "summary": data.get("summary"),
+                    "common": data.get("common", []),
+                    "confidence": data.get("confidence"),
+                    "created_at": str(data.get("created_at")) if data.get("created_at") else None,
+                    "updated_at": str(data.get("updated_at")) if data.get("updated_at") else None,
+                    "sent_images": data.get("sent_images", []),
+                }
+            )
+
+    if not plants:
+        for plant in _load_saved_plants():
+            plants.append(
+                {
+                    "id": plant.get("id"),
+                    "name": plant.get("name"),
+                    "summary": plant.get("summary"),
+                    "common": plant.get("common", []),
+                    "confidence": plant.get("confidence"),
+                    "created_at": plant.get("created_at"),
+                    "updated_at": plant.get("updated_at"),
+                    "sent_images": plant.get("sent_images", []),
+                }
+            )
 
     return {"total": len(plants), "plants": plants}
 
