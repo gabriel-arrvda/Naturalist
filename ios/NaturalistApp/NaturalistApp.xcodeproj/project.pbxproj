@@ -13,6 +13,7 @@
 		C2D41A422D2C4B3800A10004 /* SummaryFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D41A422D2C4B3800A00006 /* SummaryFormatter.swift */; };
 		C2D41A432D2C4B3800A10005 /* PlantScannerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D41A432D2C4B3800A00007 /* PlantScannerViewModel.swift */; };
 		C2D41A442D2C4B3800A10006 /* PlantService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D41A442D2C4B3800A00008 /* PlantService.swift */; };
+		C2D41A452D2C4B3800A10007 /* PlantScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D41A452D2C4B3800A00009 /* PlantScannerView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +25,7 @@
 		C2D41A422D2C4B3800A00006 /* SummaryFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryFormatter.swift; sourceTree = "<group>"; };
 		C2D41A432D2C4B3800A00007 /* PlantScannerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlantScannerViewModel.swift; sourceTree = "<group>"; };
 		C2D41A442D2C4B3800A00008 /* PlantService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlantService.swift; sourceTree = "<group>"; };
+		C2D41A452D2C4B3800A00009 /* PlantScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlantScannerView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -119,6 +121,7 @@
 			isa = PBXGroup;
 			children = (
 				C2D41A432D2C4B3800A00007 /* PlantScannerViewModel.swift */,
+				C2D41A452D2C4B3800A00009 /* PlantScannerView.swift */,
 			);
 			path = Scanner;
 			sourceTree = "<group>";
@@ -196,6 +199,7 @@
 				C2D41A422D2C4B3800A10004 /* SummaryFormatter.swift in Sources */,
 				C2D41A432D2C4B3800A10005 /* PlantScannerViewModel.swift in Sources */,
 				C2D41A442D2C4B3800A10006 /* PlantService.swift in Sources */,
+				C2D41A452D2C4B3800A10007 /* PlantScannerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
