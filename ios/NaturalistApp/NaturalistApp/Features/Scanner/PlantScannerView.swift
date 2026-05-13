@@ -53,8 +53,10 @@ struct PlantScannerView: View {
         }
         .sheet(isPresented: $showCamera) {
             CameraCaptureView { capturedImage in
-                imageData = capturedImage.jpegData(compressionQuality: 0.9) ?? capturedImage.pngData()
-                selectedFilename = "camera.jpg"
+                imageData = normalizedJPEGData(from: capturedImage)
+                if imageData != nil {
+                    selectedFilename = "camera.jpg"
+                }
             }
             .ignoresSafeArea()
         }
@@ -66,10 +68,24 @@ struct PlantScannerView: View {
         .onChange(of: pickerItem) { _, newItem in
             guard let newItem else { return }
             Task {
-                imageData = try? await newItem.loadTransferable(type: Data.self)
-                selectedFilename = "galeria.jpg"
+                let loadedData = try? await newItem.loadTransferable(type: Data.self)
+                imageData = normalizedJPEGData(from: loadedData)
+                if imageData != nil {
+                    selectedFilename = "galeria.jpg"
+                }
             }
         }
+    }
+
+    private func normalizedJPEGData(from image: UIImage) -> Data? {
+        image.jpegData(compressionQuality: 0.9)
+    }
+
+    private func normalizedJPEGData(from data: Data?) -> Data? {
+        guard let data, let image = UIImage(data: data) else {
+            return nil
+        }
+        return normalizedJPEGData(from: image)
     }
 
     @ViewBuilder
