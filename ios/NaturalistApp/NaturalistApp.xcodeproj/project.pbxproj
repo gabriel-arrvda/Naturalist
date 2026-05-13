@@ -1,0 +1,359 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		C2D41A3F2D2C4B3800A10001 /* NaturalistApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D41A3F2D2C4B3800A00001 /* NaturalistApp.swift */; };
+		C2D41A402D2C4B3800A10002 /* PlantAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D41A402D2C4B3800A00004 /* PlantAPIClient.swift */; };
+		C2D41A412D2C4B3800A10003 /* PlantResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D41A412D2C4B3800A00005 /* PlantResponse.swift */; };
+		C2D41A422D2C4B3800A10004 /* SummaryFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D41A422D2C4B3800A00006 /* SummaryFormatter.swift */; };
+		C2D41A432D2C4B3800A10005 /* PlantScannerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D41A432D2C4B3800A00007 /* PlantScannerViewModel.swift */; };
+		C2D41A442D2C4B3800A10006 /* PlantService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D41A442D2C4B3800A00008 /* PlantService.swift */; };
+		C2D41A452D2C4B3800A10007 /* PlantScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D41A452D2C4B3800A00009 /* PlantScannerView.swift */; };
+		C2D41A462D2C4B3800A10008 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D41A462D2C4B3800A0000A /* Theme.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		C2D41A3F2D2C4B3800A00001 /* NaturalistApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NaturalistApp.swift; sourceTree = "<group>"; };
+		C2D41A3F2D2C4B3800A00002 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C2D41A3F2D2C4B3800A00003 /* NaturalistApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NaturalistApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C2D41A402D2C4B3800A00004 /* PlantAPIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlantAPIClient.swift; sourceTree = "<group>"; };
+		C2D41A412D2C4B3800A00005 /* PlantResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlantResponse.swift; sourceTree = "<group>"; };
+		C2D41A422D2C4B3800A00006 /* SummaryFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryFormatter.swift; sourceTree = "<group>"; };
+		C2D41A432D2C4B3800A00007 /* PlantScannerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlantScannerViewModel.swift; sourceTree = "<group>"; };
+		C2D41A442D2C4B3800A00008 /* PlantService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlantService.swift; sourceTree = "<group>"; };
+		C2D41A452D2C4B3800A00009 /* PlantScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlantScannerView.swift; sourceTree = "<group>"; };
+		C2D41A462D2C4B3800A0000A /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		C2D41A3F2D2C4B3800A20001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		C2D41A3F2D2C4B3800A30001 = {
+			isa = PBXGroup;
+			children = (
+				C2D41A3F2D2C4B3800A30002 /* NaturalistApp */,
+				C2D41A3F2D2C4B3800A30003 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		C2D41A3F2D2C4B3800A30002 /* NaturalistApp */ = {
+			isa = PBXGroup;
+			children = (
+				C2D41A3F2D2C4B3800A30004 /* App */,
+				C2D41A402D2C4B3800A30006 /* Services */,
+				C2D41A412D2C4B3800A30007 /* Models */,
+				C2D41A422D2C4B3800A30008 /* Utils */,
+				C2D41A432D2C4B3800A30009 /* Features */,
+				C2D41A462D2C4B3800A3000B /* UI */,
+				C2D41A3F2D2C4B3800A30005 /* Resources */,
+			);
+			path = NaturalistApp;
+			sourceTree = "<group>";
+		};
+		C2D41A3F2D2C4B3800A30003 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C2D41A3F2D2C4B3800A00003 /* NaturalistApp.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C2D41A3F2D2C4B3800A30004 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				C2D41A3F2D2C4B3800A00001 /* NaturalistApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		C2D41A3F2D2C4B3800A30005 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				C2D41A3F2D2C4B3800A00002 /* Info.plist */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		C2D41A402D2C4B3800A30006 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				C2D41A402D2C4B3800A00004 /* PlantAPIClient.swift */,
+				C2D41A442D2C4B3800A00008 /* PlantService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		C2D41A412D2C4B3800A30007 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				C2D41A412D2C4B3800A00005 /* PlantResponse.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		C2D41A422D2C4B3800A30008 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				C2D41A422D2C4B3800A00006 /* SummaryFormatter.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		C2D41A432D2C4B3800A30009 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				C2D41A432D2C4B3800A3000A /* Scanner */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		C2D41A432D2C4B3800A3000A /* Scanner */ = {
+			isa = PBXGroup;
+			children = (
+				C2D41A432D2C4B3800A00007 /* PlantScannerViewModel.swift */,
+				C2D41A452D2C4B3800A00009 /* PlantScannerView.swift */,
+			);
+			path = Scanner;
+			sourceTree = "<group>";
+		};
+		C2D41A462D2C4B3800A3000B /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				C2D41A462D2C4B3800A3000C /* Theme */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		C2D41A462D2C4B3800A3000C /* Theme */ = {
+			isa = PBXGroup;
+			children = (
+				C2D41A462D2C4B3800A0000A /* Theme.swift */,
+			);
+			path = Theme;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		C2D41A3F2D2C4B3800A40001 /* NaturalistApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C2D41A3F2D2C4B3800A50002 /* Build configuration list for PBXNativeTarget "NaturalistApp" */;
+			buildPhases = (
+				C2D41A3F2D2C4B3800A20002 /* Sources */,
+				C2D41A3F2D2C4B3800A20001 /* Frameworks */,
+				C2D41A3F2D2C4B3800A20003 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = NaturalistApp;
+			productName = NaturalistApp;
+			productReference = C2D41A3F2D2C4B3800A00003 /* NaturalistApp.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		C2D41A3F2D2C4B3800A40002 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2600;
+				LastUpgradeCheck = 2600;
+				TargetAttributes = {
+					C2D41A3F2D2C4B3800A40001 = {
+						CreatedOnToolsVersion = 26.0;
+					};
+				};
+			};
+			buildConfigurationList = C2D41A3F2D2C4B3800A50001 /* Build configuration list for PBXProject "NaturalistApp" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = C2D41A3F2D2C4B3800A30001;
+			productRefGroup = C2D41A3F2D2C4B3800A30003 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C2D41A3F2D2C4B3800A40001 /* NaturalistApp */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		C2D41A3F2D2C4B3800A20003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		C2D41A3F2D2C4B3800A20002 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C2D41A3F2D2C4B3800A10001 /* NaturalistApp.swift in Sources */,
+				C2D41A402D2C4B3800A10002 /* PlantAPIClient.swift in Sources */,
+				C2D41A412D2C4B3800A10003 /* PlantResponse.swift in Sources */,
+				C2D41A422D2C4B3800A10004 /* SummaryFormatter.swift in Sources */,
+				C2D41A432D2C4B3800A10005 /* PlantScannerViewModel.swift in Sources */,
+				C2D41A442D2C4B3800A10006 /* PlantService.swift in Sources */,
+				C2D41A452D2C4B3800A10007 /* PlantScannerView.swift in Sources */,
+				C2D41A462D2C4B3800A10008 /* Theme.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		C2D41A3F2D2C4B3800A60001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		C2D41A3F2D2C4B3800A60002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		C2D41A3F2D2C4B3800A60003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = NaturalistApp/Resources/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.naturalist.NaturalistApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		C2D41A3F2D2C4B3800A60004 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = NaturalistApp/Resources/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.naturalist.NaturalistApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C2D41A3F2D2C4B3800A50001 /* Build configuration list for PBXProject "NaturalistApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C2D41A3F2D2C4B3800A60001 /* Debug */,
+				C2D41A3F2D2C4B3800A60002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C2D41A3F2D2C4B3800A50002 /* Build configuration list for PBXNativeTarget "NaturalistApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C2D41A3F2D2C4B3800A60003 /* Debug */,
+				C2D41A3F2D2C4B3800A60004 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = C2D41A3F2D2C4B3800A40002 /* Project object */;
+}
