@@ -21,14 +21,24 @@ struct PlantGalleryView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                LazyVStack(spacing: 16) {
-                    header
-                    stateContent
-                }
-                .padding()
+            List {
+                header
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
+                    .listRowInsets(EdgeInsets(top: 12, leading: 16, bottom: 0, trailing: 16))
+
+                stateContent
             }
-            .background(Theme.surface.ignoresSafeArea())
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
+            .background(
+                LinearGradient(
+                    colors: [Theme.premiumSurface, Theme.surface],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea()
+            )
             .refreshable {
                 await viewModel.loadPlants()
             }
@@ -69,8 +79,17 @@ struct PlantGalleryView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 8))
                         }
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(plantSavedTitle).font(.subheadline).bold().foregroundStyle(Theme.darkGreen).lineLimit(1)
-                            Text(plantSavedSummary).font(.caption).foregroundStyle(.secondary).lineLimit(2)
+                            Text("Planta salva")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(Theme.primaryGreen)
+                            Text(plantSavedTitle)
+                                .font(.subheadline).bold()
+                                .foregroundStyle(Theme.darkGreen)
+                                .lineLimit(1)
+                            Text(plantSavedSummary)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(2)
                         }
                         Spacer()
                         Button {
@@ -80,11 +99,15 @@ struct PlantGalleryView: View {
                         }
                         .buttonStyle(.borderedProminent)
                     }
-                    .padding(12)
-                    .background(Theme.cardBackground)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .padding(14)
+                    .background(.ultraThinMaterial)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 18, style: .continuous)
+                            .stroke(Theme.cardBorder.opacity(0.9), lineWidth: 1)
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                     .padding(.horizontal, 16)
-                    .shadow(radius: 6)
+                    .shadow(color: Theme.premiumShadow, radius: 14, x: 0, y: 8)
                     .onAppear {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
                             withAnimation {
@@ -102,13 +125,28 @@ struct PlantGalleryView: View {
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Plantas salvas")
-                .font(.largeTitle.bold())
-                .foregroundStyle(Theme.darkGreen)
-            Text("Últimas buscas com foto e resumo.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .center) {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Plantas salvas")
+                        .font(.largeTitle.bold())
+                        .foregroundStyle(Theme.darkGreen)
+                    Text("Últimas buscas com foto, nome e resumo.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Text("\(viewModel.plants.count)")
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(Theme.darkGreen)
+                    .frame(width: 40, height: 40)
+                    .background(Theme.cardBackground)
+                    .overlay(
+                        Circle()
+                            .stroke(Theme.cardBorder, lineWidth: 1)
+                    )
+                    .clipShape(Circle())
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -117,26 +155,56 @@ struct PlantGalleryView: View {
     private var stateContent: some View {
         switch viewModel.state {
         case .idle, .loading:
-            ProgressView("Carregando plantas salvas...")
-                .frame(maxWidth: .infinity, alignment: .center)
-                .padding(.top, 24)
+            if viewModel.plants.isEmpty {
+                ProgressView("Carregando plantas salvas...")
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.top, 24)
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
+                    .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 0, trailing: 16))
+            } else {
+                plantsList
+            }
         case .loaded:
             if viewModel.plants.isEmpty {
                 EmptyStateView()
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
+                    .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 0, trailing: 16))
             } else {
-                ForEach(viewModel.plants) { plant in
-                    Button {
-                        selectedPlant = plant
-                    } label: {
-                        PlantCardView(plant: plant)
-                    }
-                    .buttonStyle(.plain)
-                }
+                plantsList
             }
         case .error:
-            Text(viewModel.errorMessage)
-                .foregroundStyle(.red)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            if viewModel.plants.isEmpty {
+                Text(viewModel.errorMessage)
+                    .foregroundStyle(.red)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
+                    .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 0, trailing: 16))
+            } else {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(viewModel.errorMessage)
+                        .font(.footnote)
+                        .foregroundStyle(.red)
+                    plantsList
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var plantsList: some View {
+        ForEach(viewModel.plants) { plant in
+            Button {
+                selectedPlant = plant
+            } label: {
+                PlantCardView(plant: plant)
+            }
+            .buttonStyle(.plain)
+            .listRowSeparator(.hidden)
+            .listRowBackground(Color.clear)
+            .listRowInsets(EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16))
         }
     }
 }
@@ -150,24 +218,46 @@ private struct SavedAnalysisModalView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: 18) {
                     if let uiImage = UIImage(data: imageData) {
                         Image(uiImage: uiImage)
                             .resizable()
-                            .scaledToFit()
+                            .scaledToFill()
                             .frame(maxWidth: .infinity)
-                            .frame(height: 360)
-                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                            .frame(height: 340)
+                            .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+                            .shadow(color: Theme.premiumShadow, radius: 18, x: 0, y: 10)
                     }
 
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(title).font(.title.bold()).foregroundStyle(Theme.darkGreen)
-                        Text(summary).font(.body).foregroundStyle(.primary)
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Resultado salvo")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(Theme.primaryGreen)
+                        Text(title)
+                            .font(.title.bold())
+                            .foregroundStyle(Theme.darkGreen)
+                        Text(summary)
+                            .font(.body)
+                            .foregroundStyle(.primary)
                     }
-                    .padding()
+                    .padding(20)
+                    .background(Theme.cardBackground)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 24, style: .continuous)
+                            .stroke(Theme.cardBorder, lineWidth: 1)
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
                 }
                 .padding()
             }
+            .background(
+                LinearGradient(
+                    colors: [Theme.premiumSurface, Theme.surface],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea()
+            )
             .navigationTitle("Resultado")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -185,53 +275,76 @@ private struct PlantDetailModalView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: 18) {
                     if let url = plant.imageURL {
                         AsyncImage(url: url) { phase in
                             switch phase {
                             case .empty:
                                 RoundedRectangle(cornerRadius: 12)
                                     .fill(Theme.surface)
-                                    .frame(height: 360)
+                                    .frame(height: 340)
                                     .overlay(ProgressView())
                             case .success(let image):
-                                image.resizable().scaledToFit().frame(maxWidth: .infinity).frame(height: 360).clipShape(RoundedRectangle(cornerRadius: 12))
+                                image.resizable().scaledToFill().frame(maxWidth: .infinity).frame(height: 340).clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
                             case .failure:
                                 if let data = plant.imageData, let uiImage = UIImage(data: data) {
                                     Image(uiImage: uiImage)
                                         .resizable()
-                                        .scaledToFit()
+                                        .scaledToFill()
                                         .frame(maxWidth: .infinity)
-                                        .frame(height: 360)
-                                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                                        .frame(height: 340)
+                                        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
                                 } else {
-                                    RoundedRectangle(cornerRadius: 12).fill(Theme.surface).frame(height: 360)
+                                    RoundedRectangle(cornerRadius: 24, style: .continuous).fill(Theme.surface).frame(height: 340)
                                 }
                             @unknown default:
-                                RoundedRectangle(cornerRadius: 12).fill(Theme.surface).frame(height: 360)
+                                RoundedRectangle(cornerRadius: 24, style: .continuous).fill(Theme.surface).frame(height: 340)
                             }
                         }
+                        .shadow(color: Theme.premiumShadow, radius: 16, x: 0, y: 10)
                     } else if let data = plant.imageData, let uiImage = UIImage(data: data) {
                         Image(uiImage: uiImage)
                             .resizable()
-                            .scaledToFit()
+                            .scaledToFill()
                             .frame(maxWidth: .infinity)
-                            .frame(height: 360)
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .frame(height: 340)
+                            .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                            .shadow(color: Theme.premiumShadow, radius: 16, x: 0, y: 10)
                     } else {
-                        RoundedRectangle(cornerRadius: 12).fill(Theme.surface).frame(height: 360)
+                        RoundedRectangle(cornerRadius: 24, style: .continuous).fill(Theme.surface).frame(height: 340)
                     }
 
                     VStack(alignment: .leading, spacing: 8) {
-                        Text(plant.commonName).font(.title.bold()).foregroundStyle(Theme.darkGreen)
+                        Text("Detalhes da planta")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(Theme.primaryGreen)
+                        Text(plant.commonName)
+                            .font(.title.bold())
+                            .foregroundStyle(Theme.darkGreen)
                         if let s = plant.summary {
-                            Text(s).font(.body).foregroundStyle(.primary)
+                            Text(s)
+                                .font(.body)
+                                .foregroundStyle(.primary)
                         }
                     }
-                    .padding()
+                    .padding(20)
+                    .background(Theme.cardBackground)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 24, style: .continuous)
+                            .stroke(Theme.cardBorder, lineWidth: 1)
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
                 }
                 .padding()
             }
+            .background(
+                LinearGradient(
+                    colors: [Theme.premiumSurface, Theme.surface],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea()
+            )
             .navigationTitle("Detalhes")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -244,12 +357,16 @@ private struct PlantDetailModalView: View {
 
 private struct EmptyStateView: View {
     var body: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "leaf")
-                .font(.system(size: 32, weight: .semibold))
+        VStack(spacing: 14) {
+            Image(systemName: "leaf.fill")
+                .font(.system(size: 30, weight: .semibold))
                 .foregroundStyle(Theme.primaryGreen)
+                .frame(width: 64, height: 64)
+                .background(Theme.surface)
+                .clipShape(Circle())
             Text("Nenhuma planta salva ainda.")
                 .font(.headline)
+                .foregroundStyle(Theme.darkGreen)
             Text("As plantas buscadas aparecem aqui com a última foto enviada.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
@@ -258,8 +375,13 @@ private struct EmptyStateView: View {
         .frame(maxWidth: .infinity)
         .padding(.vertical, 32)
         .padding(.horizontal, 20)
-        .background(.white)
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .background(Theme.cardBackground)
+        .overlay(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .stroke(Theme.cardBorder, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .shadow(color: Theme.premiumShadow, radius: 14, x: 0, y: 8)
     }
 }
 
@@ -273,7 +395,7 @@ private struct PlantCardView: View {
             VStack(alignment: .leading, spacing: 8) {
                 HStack(alignment: .firstTextBaseline, spacing: 8) {
                     Text(plant.commonName)
-                        .font(.headline)
+                        .font(.headline.weight(.semibold))
                         .foregroundStyle(Theme.darkGreen)
 
                     if let confidence = plant.confidence {
@@ -299,13 +421,14 @@ private struct PlantCardView: View {
                     .lineLimit(3)
             }
         }
-        .padding(16)
+        .padding(18)
         .background(Theme.cardBackground)
         .overlay(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
                 .stroke(Theme.cardBorder, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .shadow(color: Theme.premiumShadow, radius: 12, x: 0, y: 6)
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
     }
 
     @ViewBuilder
@@ -315,37 +438,37 @@ private struct PlantCardView: View {
             AsyncImage(url: url) { phase in
                 switch phase {
                 case .empty:
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
                         .fill(Theme.surface)
-                        .frame(width: 84, height: 84)
+                        .frame(width: 96, height: 96)
                         .overlay(ProgressView().scaleEffect(0.8))
                 case .success(let image):
                     image
                         .resizable()
                         .scaledToFill()
-                        .frame(width: 84, height: 84)
-                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .frame(width: 96, height: 96)
+                        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                 case .failure:
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
                         .fill(Theme.surface)
-                        .frame(width: 84, height: 84)
+                        .frame(width: 96, height: 96)
                         .overlay(Image(systemName: "photo").foregroundStyle(.secondary))
                 @unknown default:
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
                         .fill(Theme.surface)
-                        .frame(width: 84, height: 84)
+                        .frame(width: 96, height: 96)
                 }
             }
         } else if let data = plant.thumbnailData, let uiImage = UIImage(data: data) {
             Image(uiImage: uiImage)
                 .resizable()
                 .scaledToFill()
-                .frame(width: 84, height: 84)
-                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .frame(width: 96, height: 96)
+                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         } else {
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .fill(Theme.surface)
-                .frame(width: 84, height: 84)
+                .frame(width: 96, height: 96)
                 .overlay(Image(systemName: "photo").foregroundStyle(.secondary))
         }
     }

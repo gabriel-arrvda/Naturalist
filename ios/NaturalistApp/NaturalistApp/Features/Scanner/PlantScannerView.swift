@@ -27,7 +27,14 @@ struct PlantScannerView: View {
                 }
                 .padding()
             }
-            .background(Theme.surface.ignoresSafeArea())
+            .background(
+                LinearGradient(
+                    colors: [Theme.premiumSurface, Theme.surface],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea()
+            )
             .navigationTitle("Naturalist")
         }
         .tint(Theme.primaryGreen)
@@ -84,24 +91,33 @@ struct PlantScannerView: View {
 
     private var heroCard: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Scanner inteligente")
+            Text("Scanner editorial")
                 .font(.caption.weight(.semibold))
+                .textCase(.uppercase)
+                .tracking(1.1)
                 .foregroundStyle(Theme.primaryGreen)
-            Text("Identifique e salve suas plantas com um visual mais elegante.")
-                .font(.title.bold())
+            Text("Identifique plantas com uma experiência mais elegante.")
+                .font(.largeTitle.bold())
                 .foregroundStyle(Theme.darkGreen)
-            Text("Tire uma foto ou escolha da galeria para gerar um resumo prático.")
+            Text("Fotografe ou escolha da galeria e veja um resumo limpo, bonito e pronto para salvar.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(20)
-        .background(Theme.cardBackground)
+        .padding(24)
+        .background(
+            LinearGradient(
+                colors: [Theme.cardBackground, Theme.premiumSurface],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
         .overlay(
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
                 .stroke(Theme.cardBorder, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .shadow(color: Theme.premiumShadow, radius: 18, x: 0, y: 10)
+        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
     }
 
     private var actionsCard: some View {
@@ -113,19 +129,39 @@ struct PlantScannerView: View {
                     showCameraUnavailableAlert = true
                 }
             } label: {
-                Label("Fotografar", systemImage: "camera.viewfinder")
-                    .frame(maxWidth: .infinity)
+                VStack(spacing: 6) {
+                    Image(systemName: "camera.viewfinder")
+                        .font(.headline)
+                    Text("Fotografar")
+                        .font(.subheadline.weight(.semibold))
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
             }
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
 
             PhotosPicker(selection: $pickerItem, matching: .images) {
-                Label("Galeria", systemImage: "photo.on.rectangle")
-                    .frame(maxWidth: .infinity)
+                VStack(spacing: 6) {
+                    Image(systemName: "photo.on.rectangle")
+                        .font(.headline)
+                    Text("Galeria")
+                        .font(.subheadline.weight(.semibold))
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
             }
             .buttonStyle(.bordered)
             .controlSize(.large)
         }
+        .padding(16)
+        .background(Theme.cardBackground)
+        .overlay(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .stroke(Theme.cardBorder, lineWidth: 1)
+        )
+        .shadow(color: Theme.premiumShadow, radius: 14, x: 0, y: 8)
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
     }
 
     private var previewCard: some View {
@@ -141,47 +177,52 @@ struct PlantScannerView: View {
                             .resizable()
                             .scaledToFit()
                             .frame(maxWidth: .infinity)
-                            .frame(height: 250)
-                            .clipped()
+                            .frame(height: 260)
                     } else {
                         Image(uiImage: uiImage)
                             .resizable()
                             .scaledToFill()
                             .frame(maxWidth: .infinity)
-                            .frame(height: 250)
-                            .clipped()
+                            .frame(height: 260)
                     }
                 } else {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 22, style: .continuous)
-                            .fill(Theme.surface)
-
-                        VStack(spacing: 10) {
-                            Image(systemName: "leaf")
-                                .font(.system(size: 28, weight: .semibold))
-                                .foregroundStyle(Theme.primaryGreen)
-                            Text("Escolha uma planta para analisar")
-                                .font(.headline)
-                                .foregroundStyle(Theme.darkGreen)
-                            Text("A imagem aparece aqui antes do envio.")
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                        }
-                        .padding()
+                    VStack(spacing: 10) {
+                        Image(systemName: "leaf.fill")
+                            .font(.system(size: 28, weight: .semibold))
+                            .foregroundStyle(Theme.primaryGreen)
+                            .padding(16)
+                            .background(Theme.surface)
+                            .clipShape(Circle())
+                        Text("Escolha uma planta para analisar")
+                            .font(.headline)
+                            .foregroundStyle(Theme.darkGreen)
+                        Text("A imagem aparece aqui antes do envio.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
                     }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding(.horizontal)
                     .frame(maxWidth: .infinity)
-                    .frame(height: 250)
+                    .frame(height: 260)
                 }
             }
-            .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
         }
-        .padding(20)
-        .background(Theme.cardBackground)
+        .padding(22)
+        .background(
+            LinearGradient(
+                colors: [Theme.cardBackground, Theme.premiumSurface],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
         .overlay(
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
                 .stroke(Theme.cardBorder, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .shadow(color: Theme.premiumShadow, radius: 18, x: 0, y: 10)
+        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
     }
 
     private var analyzeButton: some View {
@@ -212,6 +253,7 @@ struct PlantScannerView: View {
         .controlSize(.large)
         .disabled(imageData == nil)
         .opacity(imageData == nil ? 0.6 : 1)
+        .shadow(color: Theme.premiumShadow, radius: 12, x: 0, y: 8)
     }
 
     @ViewBuilder
@@ -270,10 +312,17 @@ private struct AnalysisResultView: View {
                 }
                 .padding()
             }
-            .background(Theme.surface.ignoresSafeArea())
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Fechar") {
+                    .background(
+                        LinearGradient(
+                            colors: [Theme.premiumSurface, Theme.surface],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        .ignoresSafeArea()
+                    )
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button("Fechar") {
                         dismiss()
                     }
                     .fontWeight(.semibold)
@@ -310,7 +359,7 @@ private struct AnalysisResultView: View {
             }
 
             LinearGradient(
-                colors: [.clear, .black.opacity(0.55)],
+                colors: [.clear, .black.opacity(0.58)],
                 startPoint: .top,
                 endPoint: .bottom
             )
@@ -326,6 +375,7 @@ private struct AnalysisResultView: View {
             .padding(20)
         }
         .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .shadow(color: Theme.premiumShadow, radius: 18, x: 0, y: 10)
     }
 
     private var summaryCard: some View {
@@ -352,6 +402,7 @@ private struct AnalysisResultView: View {
             RoundedRectangle(cornerRadius: 24, style: .continuous)
                 .stroke(Theme.cardBorder, lineWidth: 1)
         )
+        .shadow(color: Theme.premiumShadow, radius: 14, x: 0, y: 8)
         .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
     }
 }

@@ -6,4 +6,6 @@ enum Theme {
     static let surface = Color(red: 0.96, green: 0.98, blue: 0.96)
     static let cardBackground = Color.white
     static let cardBorder = Color(red: 0.86, green: 0.92, blue: 0.86)
+    static let premiumSurface = Color(red: 0.985, green: 0.988, blue: 0.978)
+    static let premiumShadow = Color.black.opacity(0.08)
 }
