@@ -39,7 +39,7 @@ jobs:
     needs: build-and-push
     steps:
       - name: Deploy to VPS via SSH
-        uses: appleboy/ssh-action@v0.1.11
+        uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
