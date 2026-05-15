@@ -1,33 +1,27 @@
 import SwiftUI
 
 enum TabBarItem: Hashable {
-    case explore
-    case favorites
+    case plants
     case scanner
-    case profile
     
     var label: String {
         switch self {
-        case .explore: return "Explore"
-        case .favorites: return "Favorites"
+        case .plants: return "Plants"
         case .scanner: return "Scanner"
-        case .profile: return "Profile"
         }
     }
     
     var icon: String {
         switch self {
-        case .explore: return "safari"
-        case .favorites: return "star.fill"
-        case .scanner: return "plus.circle.fill"
-        case .profile: return "person.crop.circle.fill"
+        case .plants: return "leaf.fill"
+        case .scanner: return "camera.fill"
         }
     }
 }
 
 @main
 struct NaturalistApp: App {
-    @State private var selectedTab: TabBarItem = .explore
+    @State private var selectedTab: TabBarItem = .plants
     
     private let plantService = PlantAPIClient(
         baseURL: URL(string: "http://187.127.253.190:8000")!
@@ -45,16 +39,10 @@ struct NaturalistApp: App {
             ZStack {
                 TabView(selection: $selectedTab) {
                     PlantGalleryView(viewModel: galleryViewModel)
-                        .tag(TabBarItem.explore)
-                    
-                    PlantGalleryView(viewModel: galleryViewModel)
-                        .tag(TabBarItem.favorites)
+                        .tag(TabBarItem.plants)
                     
                     PlantScannerView(viewModel: scannerViewModel)
                         .tag(TabBarItem.scanner)
-                    
-                    PlantGalleryView(viewModel: galleryViewModel)
-                        .tag(TabBarItem.profile)
                 }
                 .ignoresSafeArea(edges: .bottom)
                 .safeAreaInset(edge: .bottom) {
@@ -69,7 +57,7 @@ struct CustomTabBar: View {
     @Binding var selectedTab: TabBarItem
     @Environment(\.colorScheme) var colorScheme
     
-    private let tabItems: [TabBarItem] = [.explore, .favorites, .scanner, .profile]
+    private let tabItems: [TabBarItem] = [.plants, .scanner]
     
     var body: some View {
         VStack(spacing: 0) {
