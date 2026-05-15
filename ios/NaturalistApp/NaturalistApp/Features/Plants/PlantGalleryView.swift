@@ -119,26 +119,27 @@ struct PlantGalleryView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 10) {
-            HStack(alignment: .center) {
+            HStack(alignment: .center, spacing: 12) {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("Plantas salvas")
+                    Text("Meus Plantas")
                         .font(.largeTitle.bold())
-                        .foregroundStyle(Theme.darkGreen)
+                        .foregroundStyle(Theme.neuTextPrimary)
                     Text("Últimas buscas com foto, nome e resumo.")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Theme.neuTextTertiary)
                 }
                 Spacer()
                 Text("\(viewModel.plants.count)")
                     .font(.headline.weight(.semibold))
-                    .foregroundStyle(Theme.darkGreen)
-                    .frame(width: 40, height: 40)
-                    .background(Theme.cardBackground)
+                    .foregroundStyle(Theme.neuPrimaryGreen)
+                    .frame(width: 44, height: 44)
+                    .background(Theme.neuWhite)
                     .overlay(
                         Circle()
-                            .stroke(Theme.cardBorder, lineWidth: 1)
+                            .stroke(Theme.neuCardBorder, lineWidth: 1.5)
                     )
                     .clipShape(Circle())
+                    .shadow(color: Color.black.opacity(0.06), radius: 8, x: 0, y: 2)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -362,30 +363,28 @@ private struct PlantDetailModalView: View {
 private struct EmptyStateView: View {
     var body: some View {
         VStack(spacing: 14) {
-            Image(systemName: "leaf.fill")
-                .font(.system(size: 30, weight: .semibold))
-                .foregroundStyle(Theme.primaryGreen)
+            Image(systemName: "leaf.circle.fill")
+                .font(.system(size: 40, weight: .semibold))
+                .foregroundStyle(Theme.neuPrimaryGreen)
                 .frame(width: 64, height: 64)
-                .background(Theme.surface)
-                .clipShape(Circle())
             Text("Nenhuma planta salva ainda.")
                 .font(.headline)
-                .foregroundStyle(Theme.darkGreen)
+                .foregroundStyle(Theme.neuTextPrimary)
             Text("As plantas buscadas aparecem aqui com a última foto enviada.")
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Theme.neuTextTertiary)
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 32)
         .padding(.horizontal, 20)
-        .background(Theme.cardBackground)
+        .background(Theme.neuWhite)
         .overlay(
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .stroke(Theme.cardBorder, lineWidth: 1)
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(Theme.neuCardBorder, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-        .shadow(color: Theme.premiumShadow, radius: 14, x: 0, y: 8)
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 2)
     }
 }
 
@@ -393,92 +392,87 @@ private struct PlantCardView: View {
     let plant: PlantGalleryItem
 
     var body: some View {
-        HStack(alignment: .top, spacing: 14) {
-            thumbnail
+        VStack(alignment: .leading, spacing: 0) {
+            // Fixed height image (140px)
+            plantImage
+                .frame(height: 140)
+                .frame(maxWidth: .infinity)
+                .clipped()
 
+            // Info section
             VStack(alignment: .leading, spacing: 8) {
-                HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    Text(plant.commonName)
-                        .font(.headline.weight(.semibold))
-                        .foregroundStyle(Theme.darkGreen)
+                // Title
+                Text(plant.commonName)
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(Theme.neuTextPrimary)
+                    .lineLimit(1)
 
-                    if let confidence = plant.confidence {
-                        Text(confidenceLabel(confidence))
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(Theme.primaryGreen)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 5)
-                            .background(Theme.surface)
-                            .clipShape(Capsule())
-                    }
-                }
-
-                if let name = plant.name {
-                    Text(name)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
-
+                // Summary
                 Text(SummaryFormatter.cleaned(plant.summary))
-                    .font(.body)
-                    .foregroundStyle(Color.black)
-                    .lineLimit(3)
+                    .font(.system(size: 12, weight: .regular))
+                    .foregroundStyle(Theme.neuTextTertiary)
+                    .lineLimit(2)
+
+                // Detalhes button
+                HStack(spacing: 6) {
+                    Image(systemName: "info.circle.fill")
+                        .font(.system(size: 14, weight: .semibold))
+                    Text("Detalhes")
+                        .font(.system(size: 13, weight: .semibold))
+                }
+                .frame(maxWidth: .infinity)
+                .frame(height: 36)
+                .foregroundStyle(.white)
+                .background(Theme.neuPrimaryGreen)
+                .cornerRadius(8)
             }
+            .padding(12)
         }
-        .padding(18)
-        .background(Theme.cardBackground)
+        .background(Theme.neuWhite)
         .overlay(
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .stroke(Theme.cardBorder, lineWidth: 1)
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(Theme.neuCardBorder, lineWidth: 1)
         )
-        .shadow(color: Theme.premiumShadow, radius: 12, x: 0, y: 6)
-        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 2)
     }
 
     @ViewBuilder
-    private var thumbnail: some View {
+    private var plantImage: some View {
         if let url = plant.thumbnailURL {
-            // AsyncImage will fetch and cache the thumbnail from Storage URL
             AsyncImage(url: url) { phase in
                 switch phase {
                 case .empty:
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .fill(Theme.surface)
-                        .frame(width: 96, height: 96)
+                    Rectangle()
+                        .fill(Theme.neuCardBackground)
                         .overlay(ProgressView().scaleEffect(0.8))
                 case .success(let image):
                     image
                         .resizable()
                         .scaledToFill()
-                        .frame(width: 96, height: 96)
-                        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                 case .failure:
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .fill(Theme.surface)
-                        .frame(width: 96, height: 96)
-                        .overlay(Image(systemName: "photo").foregroundStyle(.secondary))
+                    Rectangle()
+                        .fill(Theme.neuCardBackground)
+                        .overlay(
+                            Image(systemName: "photo.fill")
+                                .foregroundStyle(Theme.neuTextDisabled)
+                        )
                 @unknown default:
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .fill(Theme.surface)
-                        .frame(width: 96, height: 96)
+                    Rectangle()
+                        .fill(Theme.neuCardBackground)
                 }
             }
         } else if let data = plant.thumbnailData, let uiImage = UIImage(data: data) {
             Image(uiImage: uiImage)
                 .resizable()
                 .scaledToFill()
-                .frame(width: 96, height: 96)
-                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         } else {
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(Theme.surface)
-                .frame(width: 96, height: 96)
-                .overlay(Image(systemName: "photo").foregroundStyle(.secondary))
+            Rectangle()
+                .fill(Theme.neuCardBackground)
+                .overlay(
+                    Image(systemName: "photo.fill")
+                        .foregroundStyle(Theme.neuTextDisabled)
+                )
         }
-    }
-
-    private func confidenceLabel(_ value: Double) -> String {
-        let percent = Int((value * 100).rounded())
-        return "\(percent)%"
     }
 }
