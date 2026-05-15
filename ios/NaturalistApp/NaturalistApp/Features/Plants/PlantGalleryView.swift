@@ -275,36 +275,47 @@ private struct PlantDetailModalView: View {
                             case .empty:
                                 RoundedRectangle(cornerRadius: 12)
                                     .fill(Theme.surface)
-                                    .frame(height: 340)
+                                    .frame(maxHeight: 180)
                                     .overlay(ProgressView())
                             case .success(let image):
-                                image.resizable().scaledToFill().frame(maxWidth: .infinity).frame(height: 340).clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                                image
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(maxHeight: 180)
+                                    .clipped()
+                                    .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
                             case .failure:
                                 if let data = plant.imageData, let uiImage = UIImage(data: data) {
                                     Image(uiImage: uiImage)
                                         .resizable()
-                                        .scaledToFill()
-                                        .frame(maxWidth: .infinity)
-                                        .frame(height: 340)
+                                        .scaledToFit()
+                                        .frame(maxHeight: 180)
+                                        .clipped()
                                         .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
                                 } else {
-                                    RoundedRectangle(cornerRadius: 24, style: .continuous).fill(Theme.surface).frame(height: 340)
+                                    RoundedRectangle(cornerRadius: 24, style: .continuous)
+                                        .fill(Theme.surface)
+                                        .frame(maxHeight: 180)
                                 }
                             @unknown default:
-                                RoundedRectangle(cornerRadius: 24, style: .continuous).fill(Theme.surface).frame(height: 340)
+                                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                                    .fill(Theme.surface)
+                                    .frame(maxHeight: 180)
                             }
                         }
                         .shadow(color: Theme.premiumShadow, radius: 16, x: 0, y: 10)
                     } else if let data = plant.imageData, let uiImage = UIImage(data: data) {
                         Image(uiImage: uiImage)
                             .resizable()
-                            .scaledToFill()
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 340)
+                            .scaledToFit()
+                            .frame(maxHeight: 180)
+                            .clipped()
                             .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
                             .shadow(color: Theme.premiumShadow, radius: 16, x: 0, y: 10)
                     } else {
-                        RoundedRectangle(cornerRadius: 24, style: .continuous).fill(Theme.surface).frame(height: 340)
+                        RoundedRectangle(cornerRadius: 24, style: .continuous)
+                            .fill(Theme.surface)
+                            .frame(maxHeight: 180)
                     }
 
                     VStack(alignment: .leading, spacing: 8) {
