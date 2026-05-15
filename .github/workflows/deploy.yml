@@ -48,4 +48,4 @@ jobs:
             docker pull ghcr.io/${{ github.repository_owner }}/naturalist:latest
             docker stop naturalist || true
             docker rm naturalist || true
-            docker run -d --name naturalist --restart unless-stopped -p 127.0.0.1:8000:8000 --env-file /home/naturalist/app/.env ghcr.io/${{ github.repository_owner }}/naturalist:latest
+            docker run -d --name naturalist --restart unless-stopped -p 8000:8000 --env-file /home/naturalist/app/.env ghcr.io/${{ github.repository_owner }}/naturalist:latest
