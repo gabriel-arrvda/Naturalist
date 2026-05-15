@@ -27,14 +27,7 @@ struct PlantScannerView: View {
                 }
                 .padding()
             }
-            .background(
-                LinearGradient(
-                    colors: [Theme.premiumSurface, Theme.surface],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
-            )
+            .background(Color.white.ignoresSafeArea())
             .navigationTitle("Naturalist")
         }
         .tint(Theme.primaryGreen)
@@ -63,6 +56,7 @@ struct PlantScannerView: View {
                 imageData = normalizedJPEGData(from: capturedImage)
                 if imageData != nil {
                     selectedFilename = "camera.jpg"
+                    showCamera = false // Close sheet after capture
                 }
             }
             .ignoresSafeArea()
@@ -105,13 +99,7 @@ struct PlantScannerView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(24)
-        .background(
-            LinearGradient(
-                colors: [Theme.cardBackground, Theme.premiumSurface],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        )
+        .background(Color.white)
         .overlay(
             RoundedRectangle(cornerRadius: 28, style: .continuous)
                 .stroke(Theme.cardBorder, lineWidth: 1)
@@ -210,13 +198,7 @@ struct PlantScannerView: View {
             .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
         }
         .padding(22)
-        .background(
-            LinearGradient(
-                colors: [Theme.cardBackground, Theme.premiumSurface],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        )
+        .background(Color.white)
         .overlay(
             RoundedRectangle(cornerRadius: 28, style: .continuous)
                 .stroke(Theme.cardBorder, lineWidth: 1)
@@ -312,14 +294,7 @@ private struct AnalysisResultView: View {
                 }
                 .padding()
             }
-                    .background(
-                        LinearGradient(
-                            colors: [Theme.premiumSurface, Theme.surface],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                        .ignoresSafeArea()
-                    )
+        .background(Color.white.ignoresSafeArea())
                     .toolbar {
                         ToolbarItem(placement: .topBarTrailing) {
                             Button("Fechar") {
@@ -385,7 +360,7 @@ private struct AnalysisResultView: View {
                 .foregroundStyle(Theme.primaryGreen)
             Text(presentation.summary)
                 .font(.body)
-                .foregroundStyle(.primary)
+                .foregroundStyle(Color.black)
                 .fixedSize(horizontal: false, vertical: true)
             Button {
                 dismiss()
@@ -421,7 +396,7 @@ private struct PlantSummaryCard: View {
                 .foregroundStyle(Theme.darkGreen)
             Text(summary)
                 .font(.body)
-                .foregroundStyle(.primary)
+                .foregroundStyle(Color.black)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)

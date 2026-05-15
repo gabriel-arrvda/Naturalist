@@ -31,14 +31,7 @@ struct PlantGalleryView: View {
             }
             .listStyle(.plain)
             .scrollContentBackground(.hidden)
-            .background(
-                LinearGradient(
-                    colors: [Theme.premiumSurface, Theme.surface],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
-            )
+            .background(Color.white.ignoresSafeArea())
             .refreshable {
                 await viewModel.loadPlants()
             }
@@ -238,7 +231,7 @@ private struct SavedAnalysisModalView: View {
                             .foregroundStyle(Theme.darkGreen)
                         Text(summary)
                             .font(.body)
-                            .foregroundStyle(.primary)
+                            .foregroundStyle(Color.black)
                     }
                     .padding(20)
                     .background(Theme.cardBackground)
@@ -324,7 +317,7 @@ private struct PlantDetailModalView: View {
                         if let s = plant.summary {
                             Text(s)
                                 .font(.body)
-                                .foregroundStyle(.primary)
+                                .foregroundStyle(Color.black)
                         }
                     }
                     .padding(20)
@@ -417,7 +410,7 @@ private struct PlantCardView: View {
 
                 Text(SummaryFormatter.cleaned(plant.summary))
                     .font(.body)
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(Color.black)
                     .lineLimit(3)
             }
         }
