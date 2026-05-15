@@ -9,7 +9,7 @@ torch==2.2.2
 transformers==4.36.2
 
 # --- Vetores / Busca ---
-faiss-cpu==1.7.4
+faiss-cpu==1.8
 numpy==1.24.4
 
 # --- Imagem ---
