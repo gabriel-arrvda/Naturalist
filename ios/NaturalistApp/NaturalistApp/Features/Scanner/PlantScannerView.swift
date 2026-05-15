@@ -85,27 +85,26 @@ struct PlantScannerView: View {
 
     private var heroCard: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Scanner editorial")
-                .font(.caption.weight(.semibold))
-                .textCase(.uppercase)
-                .tracking(1.1)
-                .foregroundStyle(Theme.primaryGreen)
-            Text("Identifique plantas com uma experiência mais elegante.")
-                .font(.largeTitle.bold())
-                .foregroundStyle(Theme.darkGreen)
-            Text("Fotografe ou escolha da galeria e veja um resumo limpo, bonito e pronto para salvar.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+            Text("IDENTIFY PLANTS")
+                .font(.system(size: 12, weight: .semibold))
+                .tracking(0.5)
+                .foregroundStyle(Theme.neuPrimaryGreen)
+            Text("Scan any plant to identify")
+                .font(.system(size: 28, weight: .bold))
+                .foregroundStyle(Theme.neuTextPrimary)
+            Text("Point camera at plant to see detailed information and care tips.")
+                .font(.body)
+                .foregroundStyle(Theme.neuTextTertiary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(24)
-        .background(Color.white)
+        .background(Theme.neuWhite)
         .overlay(
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .stroke(Theme.cardBorder, lineWidth: 1)
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(Theme.neuBorderLight, lineWidth: 1)
         )
-        .shadow(color: Theme.premiumShadow, radius: 18, x: 0, y: 10)
-        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 
     private var actionsCard: some View {
@@ -118,93 +117,90 @@ struct PlantScannerView: View {
                 }
             } label: {
                 VStack(spacing: 6) {
-                    Image(systemName: "camera.viewfinder")
-                        .font(.headline)
-                    Text("Fotografar")
-                        .font(.subheadline.weight(.semibold))
+                    Image(systemName: "camera.fill")
+                        .font(.system(size: 20, weight: .semibold))
+                    Text("Câmera")
+                        .font(.system(size: 14, weight: .semibold))
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
+                .padding(.vertical, 14)
+                .foregroundStyle(.white)
+                .background(Theme.neuPrimaryGreen)
+                .cornerRadius(8)
             }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.large)
 
             PhotosPicker(selection: $pickerItem, matching: .images) {
                 VStack(spacing: 6) {
-                    Image(systemName: "photo.on.rectangle")
-                        .font(.headline)
+                    Image(systemName: "photo.fill")
+                        .font(.system(size: 20, weight: .semibold))
                     Text("Galeria")
-                        .font(.subheadline.weight(.semibold))
+                        .font(.system(size: 14, weight: .semibold))
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
+                .padding(.vertical, 14)
+                .foregroundStyle(Theme.neuTextPrimary)
+                .background(Theme.neuCardBackground)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Theme.neuBorderLight, lineWidth: 1)
+                )
+                .cornerRadius(8)
             }
-            .buttonStyle(.bordered)
-            .controlSize(.large)
         }
         .padding(16)
-        .background(Theme.cardBackground)
+        .background(Theme.neuWhite)
         .overlay(
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .stroke(Theme.cardBorder, lineWidth: 1)
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(Theme.neuBorderLight, lineWidth: 1)
         )
-        .shadow(color: Theme.premiumShadow, radius: 14, x: 0, y: 8)
-        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 2)
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 
     private var previewCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Prévia")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(Theme.primaryGreen)
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(Theme.neuPrimaryGreen)
 
             Group {
                 if let imageData, let uiImage = UIImage(data: imageData) {
-                    if uiImage.size.width > uiImage.size.height * 1.3 {
-                        Image(uiImage: uiImage)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 260)
-                    } else {
-                        Image(uiImage: uiImage)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 260)
-                    }
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 180)
+                        .clipped()
                 } else {
                     VStack(spacing: 10) {
-                        Image(systemName: "leaf.fill")
-                            .font(.system(size: 28, weight: .semibold))
-                            .foregroundStyle(Theme.primaryGreen)
-                            .padding(16)
-                            .background(Theme.surface)
-                            .clipShape(Circle())
+                        Image(systemName: "camera.fill")
+                            .font(.system(size: 32, weight: .semibold))
+                            .foregroundStyle(Theme.neuPrimaryGreen)
                         Text("Escolha uma planta para analisar")
-                            .font(.headline)
-                            .foregroundStyle(Theme.darkGreen)
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(Theme.neuTextPrimary)
                         Text("A imagem aparece aqui antes do envio.")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .font(.system(size: 14, weight: .regular))
+                            .foregroundStyle(Theme.neuTextTertiary)
                             .multilineTextAlignment(.center)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .padding(.horizontal)
+                    .background(Color(red: 0.15, green: 0.15, blue: 0.15))
                     .frame(maxWidth: .infinity)
-                    .frame(height: 260)
+                    .frame(height: 180)
                 }
             }
-            .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
-        .padding(22)
-        .background(Color.white)
+        .padding(20)
+        .background(Theme.neuWhite)
         .overlay(
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .stroke(Theme.cardBorder, lineWidth: 1)
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(Theme.neuBorderLight, lineWidth: 1)
         )
-        .shadow(color: Theme.premiumShadow, radius: 18, x: 0, y: 10)
-        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 2)
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 
     private var analyzeButton: some View {
@@ -228,14 +224,21 @@ struct PlantScannerView: View {
                 }
             }
         } label: {
-            Label("Analisar planta", systemImage: "sparkles")
-                .frame(maxWidth: .infinity)
+            HStack(spacing: 8) {
+                Image(systemName: "sparkles")
+                    .font(.system(size: 16, weight: .semibold))
+                Text("Analisar")
+                    .font(.system(size: 16, weight: .semibold))
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 14)
+            .foregroundStyle(.white)
+            .background(Theme.neuPrimaryGreen)
+            .cornerRadius(8)
         }
-        .buttonStyle(.borderedProminent)
-        .controlSize(.large)
         .disabled(imageData == nil)
         .opacity(imageData == nil ? 0.6 : 1)
-        .shadow(color: Theme.premiumShadow, radius: 12, x: 0, y: 8)
+        .shadow(color: Theme.neuPrimaryGreen.opacity(0.3), radius: 8, x: 0, y: 4)
     }
 
     @ViewBuilder
