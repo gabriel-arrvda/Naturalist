@@ -67,6 +67,11 @@ else
   echo "Updating repo in $APP_DIR"
   sudo -u "$APP_USER" bash -lc "cd $APP_DIR && git fetch --all && git checkout $BRANCH && git pull --ff-only origin $BRANCH" || echo "git pull failed, continuing"
 fi
+# Ensure app dir ownership/permissions so app user can read/write files
+chown -R "$APP_USER":"$APP_USER" "$APP_DIR"
+# Set sane permissions so files are readable by app user and venv steps won't fail
+find "$APP_DIR" -type f -exec chmod 644 {} + || true
+find "$APP_DIR" -type d -exec chmod 755 {} + || true
 
 # Create virtualenv with fallbacks
 echo "Creating virtualenv in $VENV_DIR"
