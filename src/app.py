@@ -73,7 +73,7 @@ def _get_firestore_db():
 
     try:
         if not firebase_admin._apps:
-            cred_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS", "serviceAccountKey.json")
+            cred_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
             cred = credentials.Certificate(cred_path)
             storage_bucket = os.getenv("FIREBASE_STORAGE_BUCKET")
             # sanitize bucket value in case user provided a gs:// URL
