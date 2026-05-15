@@ -18,4 +18,15 @@ enum Theme {
     static let tabBarTextInactive = Color(red: 0.6, green: 0.6, blue: 0.6) // #999999
     static let tabBarCardShadow = Color.black.opacity(0.06)
     static let tabBarCardActiveShadow = Color(red: 0.176, green: 0.618, blue: 0.247, opacity: 0.3) // #2d9e3f with 30% opacity
+    
+    // Neumorphic color system - independent of system theme
+    static let neuWhite = Color(red: 1.0, green: 1.0, blue: 1.0) // #ffffff
+    static let neuCardBackground = Color(red: 0.976, green: 0.976, blue: 0.976) // #f9f9f9
+    static let neuCardBorder = Color(red: 0.941, green: 0.941, blue: 0.941) // #f0f0f0
+    static let neuPrimaryGreen = Color(red: 0.176, green: 0.620, blue: 0.247) // #2d9e3f
+    static let neuTextPrimary = Color(red: 0.0, green: 0.0, blue: 0.0) // #000000
+    static let neuTextSecondary = Color(red: 0.2, green: 0.2, blue: 0.2) // #333333
+    static let neuTextTertiary = Color(red: 0.4, green: 0.4, blue: 0.4) // #666666
+    static let neuTextDisabled = Color(red: 0.6, green: 0.6, blue: 0.6) // #999999
+    static let neuBorderLight = Color(red: 0.933, green: 0.933, blue: 0.933) // #eeeeee
 }
