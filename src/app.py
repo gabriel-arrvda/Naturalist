@@ -25,8 +25,9 @@ except Exception:  # pragma: no cover - dependency is optional for local runs
     storage = None
 
 db = None
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
-load_dotenv()
+load_dotenv(PROJECT_ROOT / ".env")
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("naturalist")
@@ -62,6 +63,35 @@ LLM_CLIENT = None
 PLANTS_STORE_PATH = Path(os.getenv("PLANTS_STORE_PATH", "data/plants.json"))
 
 
+def _resolve_firestore_credentials() -> Optional[Any]:
+    raw_json = os.getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON")
+    if raw_json:
+        try:
+            payload = json.loads(raw_json)
+        except json.JSONDecodeError:
+            logger.warning("GOOGLE_APPLICATION_CREDENTIALS_JSON não contém JSON válido")
+        else:
+            if isinstance(payload, dict):
+                private_key = payload.get("private_key")
+                if isinstance(private_key, str) and "\\n" in private_key:
+                    payload = dict(payload)
+                    payload["private_key"] = private_key.replace("\\n", "\n")
+                required_keys = {"type", "project_id", "private_key_id", "private_key", "client_email", "client_id", "token_uri"}
+                if required_keys.issubset(payload.keys()):
+                    try:
+                        return credentials.Certificate(payload)
+                    except Exception:
+                        logger.exception(
+                            "GOOGLE_APPLICATION_CREDENTIALS_JSON não gerou uma credencial válida"
+                        )
+                else:
+                    logger.warning("GOOGLE_APPLICATION_CREDENTIALS_JSON não tem os campos esperados")
+            else:
+                logger.warning("GOOGLE_APPLICATION_CREDENTIALS_JSON precisa ser um objeto JSON")
+
+    return None
+
+
 def _get_firestore_db():
     global db
     if db is not None:
@@ -73,8 +103,15 @@ def _get_firestore_db():
 
     try:
         if not firebase_admin._apps:
-            cred_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS", "serviceAccountKey.json")
-            cred = credentials.Certificate(cred_path)
+            cred_source = _resolve_firestore_credentials()
+            if cred_source is None:
+                logger.warning(
+                    "Credenciais do Firebase ausentes; configure GOOGLE_APPLICATION_CREDENTIALS_JSON, "
+                    "GOOGLE_APPLICATION_CREDENTIALS ou serviceAccountKey.json"
+                )
+                return None
+
+            cred = cred_source
             storage_bucket = os.getenv("FIREBASE_STORAGE_BUCKET")
             # sanitize bucket value in case user provided a gs:// URL
             if storage_bucket:

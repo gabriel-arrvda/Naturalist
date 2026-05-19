@@ -19,40 +19,6 @@ enum TabBarItem: Hashable {
     }
 }
 
-@main
-struct NaturalistApp: App {
-    @State private var selectedTab: TabBarItem = .plants
-    
-    private let plantService = PlantAPIClient(
-        baseURL: URL(string: "http://187.127.253.190:8000")!
-    )
-    private let scannerViewModel: PlantScannerViewModel
-    private let galleryViewModel: PlantGalleryViewModel
-
-    init() {
-        scannerViewModel = PlantScannerViewModel(service: plantService)
-        galleryViewModel = PlantGalleryViewModel(service: plantService)
-    }
-
-    var body: some Scene {
-        WindowGroup {
-            ZStack {
-                TabView(selection: $selectedTab) {
-                    PlantGalleryView(viewModel: galleryViewModel)
-                        .tag(TabBarItem.plants)
-                    
-                    PlantScannerView(viewModel: scannerViewModel)
-                        .tag(TabBarItem.scanner)
-                }
-                .ignoresSafeArea(edges: .bottom)
-                .safeAreaInset(edge: .bottom) {
-                    CustomTabBar(selectedTab: $selectedTab)
-                }
-            }
-        }
-    }
-}
-
 struct CustomTabBar: View {
     @Binding var selectedTab: TabBarItem
     @Environment(\.colorScheme) var colorScheme
@@ -63,7 +29,7 @@ struct CustomTabBar: View {
         VStack(spacing: 0) {
             Divider()
                 .frame(height: 1)
-                .background(Color(red: 0.933, green: 0.933, blue: 0.933))
+                .background(Color(red: 0.933, green: 0.933, blue: 0.933)) // #eeeeee
             
             HStack(spacing: 12) {
                 ForEach(tabItems, id: \.self) { tab in
@@ -76,7 +42,7 @@ struct CustomTabBar: View {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
-            .padding(.bottom, 4)
+            .padding(.bottom, 4) // Minimal bottom margin
             .frame(height: 68)
             .background(Color.white)
         }
@@ -102,8 +68,8 @@ struct TabBarCard: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(
                 isActive
-                    ? Color(red: 0.176, green: 0.618, blue: 0.247)
-                    : Color(red: 0.976, green: 0.976, blue: 0.976)
+                    ? Color(red: 0.176, green: 0.618, blue: 0.247) // #2d9e3f
+                    : Color(red: 0.976, green: 0.976, blue: 0.976) // #f9f9f9
             )
             .cornerRadius(10)
             .shadow(
@@ -114,10 +80,21 @@ struct TabBarCard: View {
                 x: 0,
                 y: isActive ? 4 : 1
             )
-            .scaleEffect(isActive ? 0.98 : 1.0)
+            .scaleEffect(isActive ? 0.98 : 1.0) // Subtle lift via inverse scale
             .offset(y: isActive ? -2 : 0)
             .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isActive)
         }
         .buttonStyle(PlainButtonStyle())
     }
+}
+
+#Preview {
+    @Previewable @State var selected = TabBarItem.plants
+    
+    VStack {
+        Spacer()
+        CustomTabBar(selectedTab: $selected)
+    }
+    .background(Color.white)
+    .ignoresSafeArea(edges: .bottom)
 }
